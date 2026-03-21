@@ -1,0 +1,379 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:animate_do/animate_do.dart';
+import '../../../core/theme/app_colors.dart';
+import '../widgets/sos_pulse_button.dart';
+import '../widgets/emergency_type_grid.dart';
+import '../widgets/dispatch_status_card.dart';
+
+class EmergencyScreen extends StatefulWidget {
+  const EmergencyScreen({super.key});
+  @override
+  State<EmergencyScreen> createState() => _EmergencyScreenState();
+}
+
+class _EmergencyScreenState extends State<EmergencyScreen> {
+  String _selectedType   = 'Ambulance';
+  String _description    = '';
+  bool   _alertSent      = false;
+  bool   _isLoading      = false;
+
+  final _descController = TextEditingController();
+
+  void _sendAlert() {
+    HapticFeedback.heavyImpact();
+    setState(() => _isLoading = true);
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) setState(() { _isLoading = false; _alertSent = true; });
+    });
+  }
+
+  @override
+  void dispose() {
+    _descController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0D0507),
+      body: Column(
+        children: [
+          _TopBar(),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  // Pulsing SOS button
+                  FadeInDown(
+                    child: SosPulseButton(activated: _alertSent),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Heading
+                  FadeInUp(
+                    delay: const Duration(milliseconds: 100),
+                    child: Text(
+                      _alertSent
+                          ? 'Help is on the way!'
+                          : 'Request Emergency Help',
+                      style: const TextStyle(
+                        color: Colors.white, fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  FadeInUp(
+                    delay: const Duration(milliseconds: 150),
+                    child: Text(
+                      _alertSent
+                          ? 'Ambulance dispatched. Hospitals alerted\nalong your Ayur ID medical summary.'
+                          : 'Fill the form below. Hospitals &\nambulances will be notified instantly.',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white54, fontSize: 13,
+                        height: 1.6,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+
+                  if (!_alertSent) ...[
+                    // Location field
+                    FadeInUp(
+                      delay: const Duration(milliseconds: 200),
+                      child: _FormGroup(
+                        label: 'YOUR LOCATION',
+                        child: _DarkField(
+                          prefixIcon: Icons.location_on_rounded,
+                          value: 'Jubilee Hills, Hyderabad — 500033',
+                          readOnly: true,
+                          suffixIcon: Icons.my_location_rounded,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Emergency type
+                    FadeInUp(
+                      delay: const Duration(milliseconds: 250),
+                      child: _FormGroup(
+                        label: 'EMERGENCY TYPE',
+                        child: EmergencyTypeGrid(
+                          selected: _selectedType,
+                          onSelected: (t) =>
+                              setState(() => _selectedType = t),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Description
+                    FadeInUp(
+                      delay: const Duration(milliseconds: 300),
+                      child: _FormGroup(
+                        label: 'BRIEF DESCRIPTION',
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.07),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.12),
+                              width: 0.5,
+                            ),
+                          ),
+                          child: TextField(
+                            controller: _descController,
+                            onChanged: (v) =>
+                                setState(() => _description = v),
+                            maxLines: 3,
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 14),
+                            decoration: const InputDecoration(
+                              hintText:
+                                  'Describe the emergency briefly…',
+                              hintStyle: TextStyle(
+                                  color: Colors.white24, fontSize: 13),
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.all(14),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+
+                    // Send button
+                    FadeInUp(
+                      delay: const Duration(milliseconds: 350),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 58,
+                        child: ElevatedButton(
+                          onPressed: _isLoading ? null : _sendAlert,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.emergency,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: _isLoading
+                              ? const SizedBox(
+                                  width: 24, height: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2.5,
+                                  ),
+                                )
+                              : const Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.emergency_share_rounded,
+                                        size: 22),
+                                    SizedBox(width: 10),
+                                    Text('SEND EMERGENCY ALERT',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 0.8,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                        ),
+                      ),
+                    ),
+                  ],
+
+                  if (_alertSent) ...[
+                    // Dispatch status
+                    FadeInUp(
+                      child: const DispatchStatusCard(),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Cancel/Track button
+                    FadeInUp(
+                      delay: const Duration(milliseconds: 200),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Colors.white.withOpacity(0.1),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          child: const Text('Track Ambulance Live',
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+
+                  const SizedBox(height: 20),
+
+                  // No payment notice
+                  FadeInUp(
+                    delay: const Duration(milliseconds: 400),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.lock_outline_rounded,
+                              color: Colors.white38, size: 16),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'No payment required at emergency stage.'
+                              ' Settlement handled post-care.',
+                              style: TextStyle(
+                                  color: Colors.white38,
+                                  fontSize: 12, height: 1.5),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Top Bar ──────────────────────────────────────────────
+class _TopBar extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: const Color(0xFF1A0A0A),
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top + 10,
+        left: 16, right: 16, bottom: 14,
+      ),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              width: 36, height: 36,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.arrow_back_ios_new_rounded,
+                  color: Colors.white, size: 16),
+            ),
+          ),
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Text('Emergency SOS',
+              style: TextStyle(color: Colors.white,
+                  fontSize: 18, fontWeight: FontWeight.w700),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(
+                horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: AppColors.emergency.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Text('LIVE',
+              style: TextStyle(color: AppColors.emergency,
+                  fontSize: 11, fontWeight: FontWeight.w800,
+                  letterSpacing: 1),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Form Group ───────────────────────────────────────────
+class _FormGroup extends StatelessWidget {
+  final String label;
+  final Widget child;
+  const _FormGroup({required this.label, required this.child});
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label,
+          style: const TextStyle(
+            color: Colors.white54, fontSize: 11,
+            fontWeight: FontWeight.w700, letterSpacing: 0.8,
+          ),
+        ),
+        const SizedBox(height: 8),
+        child,
+      ],
+    );
+  }
+}
+
+// ── Dark Input Field ─────────────────────────────────────
+class _DarkField extends StatelessWidget {
+  final IconData prefixIcon;
+  final String value;
+  final bool readOnly;
+  final IconData? suffixIcon;
+  const _DarkField({
+    required this.prefixIcon,
+    required this.value,
+    this.readOnly = false,
+    this.suffixIcon,
+  });
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.07),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+            color: Colors.white.withOpacity(0.12), width: 0.5),
+      ),
+      child: Row(
+        children: [
+          Icon(prefixIcon, color: AppColors.emergency, size: 18),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(value,
+              style: const TextStyle(
+                  color: Colors.white, fontSize: 13)),
+          ),
+          if (suffixIcon != null)
+            Icon(suffixIcon, color: Colors.white38, size: 18),
+        ],
+      ),
+    );
+  }
+}
