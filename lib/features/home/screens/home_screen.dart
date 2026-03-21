@@ -10,7 +10,7 @@ import '../../medicines/screens/medicine_screen.dart';
 import '../../homecare/screens/symptom_diet_screen.dart';
 import '../../emergency/screens/emergency_screen.dart';
 import '../../chat/screens/ai_chat_screen.dart';
-import '../../neutrimap/screens/neutrimap_screen.dart';
+import '../../diet/screens/diet_map_screen.dart';
 import '../../schemes/screens/schemes_screen.dart';
 import '../../opportunities/screens/opportunities_screen.dart';
 import '../../records/screens/records_screen.dart';
@@ -629,7 +629,7 @@ class _HealthServicesRow extends StatelessWidget {
       ('🥗', 'Neutrimap',
           () => Navigator.push(context,
               MaterialPageRoute(builder: (_) =>
-                  const NeutrimapScreen()))),
+                  const DietMapScreen()))),
       ('🚑', context.tr('ambulance_module'),
           () => Navigator.push(context,
               MaterialPageRoute(builder: (_) =>
