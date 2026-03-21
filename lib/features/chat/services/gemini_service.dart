@@ -4,10 +4,10 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class GeminiService {
-  // Direct key — no .env dependency
   static const _apiKey =
       'AIzaSyCn6Fe17Pd1ipAeGv8oM0rcOyEdmtFtlWw';
 
+  // gemini-2.0-flash is the correct working model as of 2026
   static const _url =
       'https://generativelanguage.googleapis.com'
       '/v1beta/models/gemini-2.0-flash:generateContent';
@@ -20,7 +20,7 @@ class GeminiService {
       'under cardiology care with Dr Ravi Kumar, Apollo Hospitals. '
       'Medications: Amlodipine 5mg, Atorvastatin 10mg, Aspirin 75mg. '
       'Allergy: Penicillin. '
-      'Instructions: Always reply in under 120 words. '
+      'Always reply in under 120 words. '
       'Be warm, empathetic, and clear. '
       'Never diagnose — provide general health guidance only. '
       'For emergency symptoms say to use Emergency SOS immediately. '
@@ -28,24 +28,22 @@ class GeminiService {
       'End with a helpful follow-up question.';
 
   static Future<String> chat(
-    List<Map<String, String>> history,
-    String userMessage,
-  ) async {
-    debugPrint('🚀 GeminiService.chat called');
-    debugPrint('📝 User message: $userMessage');
+      List<Map<String, String>> history,
+      String userMessage,
+      ) async {
+    debugPrint('🚀 Calling Gemini: $userMessage');
 
     try {
       final uri = Uri.parse('$_url?key=$_apiKey');
 
-      // Build the simplest valid request
+      // Simplest valid request — inject system context in user message
       final body = jsonEncode({
         'contents': [
           {
             'role': 'user',
             'parts': [
               {
-                'text': '$_systemPrompt\n\n'
-                    'Patient question: $userMessage',
+                'text': '$_systemPrompt\n\nPatient question: $userMessage',
               }
             ],
           }
@@ -57,136 +55,86 @@ class GeminiService {
         },
       });
 
-      debugPrint('📤 Sending request to Gemini...');
-
       final response = await http
           .post(
-            uri,
-            headers: {'Content-Type': 'application/json'},
-            body: body,
-          )
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: body,
+      )
           .timeout(const Duration(seconds: 30));
 
-      debugPrint('📥 Response status: ${response.statusCode}');
-      debugPrint('📥 Response body: ${response.body}');
+      debugPrint('📥 Status: ${response.statusCode}');
+      debugPrint('📥 Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        final text = _parseSuccess(response.body);
-        debugPrint('✅ Parsed reply: $text');
-        return text;
+        return _parseSuccess(response.body);
       } else if (response.statusCode == 429) {
-        debugPrint('⚠️ Rate limited, waiting 5s...');
-        await Future.delayed(const Duration(seconds: 5));
-        return await _retry(userMessage);
-      } else if (response.statusCode == 400) {
-        debugPrint('❌ 400 error: ${response.body}');
-        return _parseError(response.body);
+        await Future.delayed(const Duration(seconds: 6));
+        return await _retrySimple(userMessage);
       } else if (response.statusCode == 403) {
-        return '❌ API key rejected (403). '
-            'Please regenerate your Gemini API key at '
-            'aistudio.google.com';
+        return '❌ API key invalid. Please regenerate at aistudio.google.com';
+      } else if (response.statusCode == 404) {
+        return '❌ Model not found (404). Contact support.';
       } else {
-        debugPrint('❌ Unknown error: ${response.statusCode}');
-        return 'Server error ${response.statusCode}. '
-            'Please try again.';
+        final err = jsonDecode(response.body);
+        final msg = err['error']?['message'] ?? 'Unknown error';
+        return 'Error ${response.statusCode}: $msg';
       }
     } on TimeoutException {
-      debugPrint('⏰ Request timed out');
-      return 'Request timed out. '
-          'Please check your internet connection. 🔄';
+      return 'Request timed out. Check your internet. 🔄';
     } catch (e) {
       debugPrint('💥 Exception: $e');
-      return 'Error: ${e.toString()}\n\n'
-          'Please check your internet connection.';
+      return 'Connection error. Please check your internet.';
     }
   }
 
-  // Retry with even simpler request
-  static Future<String> _retry(String userMessage) async {
+  static Future<String> _retrySimple(String userMessage) async {
     try {
       final uri = Uri.parse('$_url?key=$_apiKey');
       final body = jsonEncode({
         'contents': [
           {
             'parts': [
-              {'text': 'Answer briefly as a medical assistant: $userMessage'}
+              {'text': 'Answer as a medical assistant briefly: $userMessage'}
             ]
           }
         ],
       });
-
       final response = await http
           .post(uri,
-              headers: {'Content-Type': 'application/json'},
-              body: body)
+          headers: {'Content-Type': 'application/json'}, body: body)
           .timeout(const Duration(seconds: 30));
-
-      if (response.statusCode == 200) {
-        return _parseSuccess(response.body);
-      }
-      return 'AI is busy right now. Please try again in 30 seconds. ⏳';
+      if (response.statusCode == 200) return _parseSuccess(response.body);
+      return 'AI is busy. Please wait 30 seconds and try again. ⏳';
     } catch (_) {
       return 'Still unable to connect. Please try again. 🔄';
     }
   }
 
-  // Parse successful 200 response
   static String _parseSuccess(String body) {
     try {
       final data = jsonDecode(body) as Map<String, dynamic>;
-
-      // Check for safety block
-      final feedback = data['promptFeedback'] as Map?;
-      if (feedback?['blockReason'] != null) {
-        return 'I cannot answer that for safety reasons. '
-            'Please rephrase your question.';
-      }
-
       final candidates = data['candidates'] as List?;
       if (candidates == null || candidates.isEmpty) {
-        return 'No response from AI. Please try again.';
+        return 'No response received. Please try again.';
       }
-
       final candidate = candidates[0] as Map<String, dynamic>;
-
-      // Check finish reason
       final finishReason = candidate['finishReason'] as String?;
       if (finishReason == 'SAFETY') {
-        return 'Response blocked for safety. '
-            'Please consult a doctor directly. 🏥';
+        return 'Response blocked for safety. Please consult a doctor. 🏥';
       }
-      if (finishReason == 'RECITATION') {
-        return 'I cannot reproduce that content. '
-            'Please ask in a different way.';
-      }
-
       final content = candidate['content'] as Map?;
       final parts = content?['parts'] as List?;
       final text = parts?.isNotEmpty == true
           ? parts![0]['text'] as String?
           : null;
-
       if (text == null || text.trim().isEmpty) {
         return 'Received empty response. Please try again.';
       }
-
       return text.trim();
     } catch (e) {
-      debugPrint('Parse error: $e\nBody: $body');
+      debugPrint('Parse error: $e');
       return 'Could not read AI response. Please try again.';
-    }
-  }
-
-  // Parse error response body
-  static String _parseError(String body) {
-    try {
-      final data = jsonDecode(body) as Map<String, dynamic>;
-      final error = data['error'] as Map?;
-      final message = error?['message'] as String?;
-      return 'AI error: ${message ?? "Unknown error"}. '
-          'Please try again.';
-    } catch (_) {
-      return 'Bad request error. Please try again.';
     }
   }
 }
