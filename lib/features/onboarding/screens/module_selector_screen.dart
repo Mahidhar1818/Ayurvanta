@@ -3,6 +3,7 @@ import 'package:animate_do/animate_do.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/models/app_module.dart';
 import '../../auth/screens/auth_screen.dart';
+import '../../hospital/screens/hospital_role_selector_screen.dart';
 
 class ModuleSelectorScreen extends StatelessWidget {
   const ModuleSelectorScreen({super.key});
@@ -13,7 +14,6 @@ class ModuleSelectorScreen extends StatelessWidget {
       backgroundColor: AppColors.bgPage,
       body: Column(
         children: [
-          // Top bar
           Container(
             color: AppColors.navyDark,
             padding: EdgeInsets.only(
@@ -33,14 +33,13 @@ class ModuleSelectorScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
-                          Icons.health_and_safety_rounded,
-                          color: Colors.white, size: 22),
+                            Icons.health_and_safety_rounded,
+                            color: Colors.white, size: 22),
                       ),
                       const SizedBox(width: 10),
                       const Text('AyurVanta',
-                        style: TextStyle(color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800)),
+                          style: TextStyle(color: Colors.white,
+                              fontSize: 20, fontWeight: FontWeight.w800)),
                     ],
                   ),
                 ),
@@ -48,24 +47,21 @@ class ModuleSelectorScreen extends StatelessWidget {
                 FadeInLeft(
                   delay: const Duration(milliseconds: 200),
                   child: const Text('Welcome! 👋',
-                    style: TextStyle(color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w800)),
+                      style: TextStyle(color: Colors.white,
+                          fontSize: 24, fontWeight: FontWeight.w800)),
                 ),
                 const SizedBox(height: 6),
                 FadeInLeft(
                   delay: const Duration(milliseconds: 300),
                   child: const Text(
-                    'Select your role to get started\n'
-                    'with the right AyurVanta experience.',
-                    style: TextStyle(color: AppColors.textHint,
-                        fontSize: 13, height: 1.5)),
+                      'Select your role to get started\n'
+                          'with the right AyurVanta experience.',
+                      style: TextStyle(color: AppColors.textHint,
+                          fontSize: 13, height: 1.5)),
                 ),
               ],
             ),
           ),
-
-          // Module grid
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
@@ -75,7 +71,7 @@ class ModuleSelectorScreen extends StatelessWidget {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
+                    const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       crossAxisSpacing: 12,
                       mainAxisSpacing: 12,
@@ -88,10 +84,18 @@ class ModuleSelectorScreen extends StatelessWidget {
                         delay: Duration(milliseconds: i * 80),
                         child: _ModuleCard(
                           info: mod,
-                          onTap: () => Navigator.push(context,
-                            MaterialPageRoute(builder: (_) =>
-                              AuthScreen(module: mod)),
-                          ),
+                          onTap: () {
+                            // Hospital goes to role selector
+                            if (mod.module == AppModule.hospital) {
+                              Navigator.push(context,
+                                  MaterialPageRoute(builder: (_) =>
+                                  const HospitalRoleSelectorScreen()));
+                            } else {
+                              Navigator.push(context,
+                                  MaterialPageRoute(builder: (_) =>
+                                      AuthScreen(module: mod)));
+                            }
+                          },
                         ),
                       );
                     },
@@ -105,19 +109,17 @@ class ModuleSelectorScreen extends StatelessWidget {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                            color: const Color(0xFFE3EAF2),
-                            width: 0.5),
+                            color: const Color(0xFFE3EAF2), width: 0.5),
                       ),
                       child: const Row(
                         children: [
                           Icon(Icons.info_outline_rounded,
-                              color: AppColors.textSecondary,
-                              size: 16),
+                              color: AppColors.textSecondary, size: 16),
                           SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               'Each module has its own account. '
-                              'Your Ayur ID works across all of them.',
+                                  'Your Ayur ID works across all of them.',
                               style: TextStyle(fontSize: 12,
                                   color: AppColors.textSecondary,
                                   height: 1.5),
@@ -163,23 +165,18 @@ class _ModuleCard extends StatelessWidget {
                 color: info.iconBg,
                 borderRadius: BorderRadius.circular(13),
               ),
-              child: Center(
-                child: Text(info.emoji,
-                    style: const TextStyle(fontSize: 22))),
+              child: Center(child: Text(info.emoji,
+                  style: const TextStyle(fontSize: 22))),
             ),
             const Spacer(),
             Text(info.name,
-              style: TextStyle(fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  color: info.textColor)),
+                style: TextStyle(fontSize: 15,
+                    fontWeight: FontWeight.w800, color: info.textColor)),
             const SizedBox(height: 4),
             Text(info.description,
-              style: TextStyle(fontSize: 10,
-                  color: info.textColor.withOpacity(0.65),
-                  height: 1.4),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
+                style: TextStyle(fontSize: 10,
+                    color: info.textColor.withOpacity(0.65), height: 1.4),
+                maxLines: 2, overflow: TextOverflow.ellipsis),
           ],
         ),
       ),
