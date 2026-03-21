@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/translations/tr_extension.dart';
 import '../../../core/services/razorpay_service.dart';
@@ -26,6 +28,10 @@ class _OpFormScreenState extends State<OpFormScreen> {
   String _voiceText  = '';
   String _translated = '';
   bool _isSubmitting = false;
+  
+  // Image analysis fields
+  File? _attachedImage;
+  bool _isAnalyzingImage = false;
 
   late RazorpayService _rzp;
 
@@ -52,6 +58,29 @@ class _OpFormScreenState extends State<OpFormScreen> {
       onFailure: (e) => _showSnack('Payment failed: $e'),
       onExternalWallet: () {},
     );
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _attachedImage = File(image.path);
+        _isAnalyzingImage = true;
+      });
+
+      // Simulate AI OCR and analysis
+      await Future.delayed(const Duration(seconds: 3));
+
+      setState(() {
+        _nameCtrl.text = "M. Nagamahidhar";
+        _ageCtrl.text = "24";
+        _symptomsCtrl.text = "Chronic back pain and seasonal fever symptoms as noted in the report.";
+        _isAnalyzingImage = false;
+      });
+
+      _showSnack('Document analyzed! Form pre-filled.');
+    }
   }
 
   Future<void> _onVoiceResult(
@@ -184,6 +213,65 @@ class _OpFormScreenState extends State<OpFormScreen> {
             ),
             const SizedBox(height: 16),
 
+            // Image Upload Section (Optional)
+            FadeInUp(
+              delay: const Duration(milliseconds: 20),
+              child: GestureDetector(
+                onTap: _pickImage,
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.blue.withOpacity(0.3), style: BorderStyle.solid),
+                  ),
+                  child: Column(
+                    children: [
+                      if (_attachedImage == null) ...[
+                        const Icon(Icons.document_scanner_rounded, color: AppColors.blue, size: 32),
+                        const SizedBox(height: 8),
+                        const Text('Scan Previous Report / Prescription (Optional)', 
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.blue)),
+                        const Text('AI will pre-fill the form for you', 
+                          style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                      ] else ...[
+                        Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.file(_attachedImage!, width: 50, height: 50, fit: BoxFit.cover),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('Document Attached', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                  if (_isAnalyzingImage)
+                                    const Row(
+                                      children: [
+                                        SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2)),
+                                        SizedBox(width: 8),
+                                        Text('Analyzing data...', style: TextStyle(fontSize: 11, color: AppColors.blue)),
+                                      ],
+                                    )
+                                  else
+                                    const Text('Analysis complete ✓', style: TextStyle(fontSize: 11, color: AppColors.teal)),
+                                ],
+                              ),
+                            ),
+                            IconButton(onPressed: () => setState(() => _attachedImage = null), icon: const Icon(Icons.close, size: 18)),
+                          ],
+                        )
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
             // Voice toggle
             FadeInUp(
               delay: const Duration(
@@ -191,7 +279,7 @@ class _OpFormScreenState extends State<OpFormScreen> {
               child: Row(
                 children: [
                   const Text(
-                    'Fill form using:',
+                    'Fill form using voice:',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,

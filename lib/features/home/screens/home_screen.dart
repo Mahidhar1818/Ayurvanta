@@ -7,7 +7,7 @@ import '../../../core/translations/tr_extension.dart';
 import '../../appointments/screens/op_booking_screen.dart';
 import '../../consultation/screens/consultation_screen.dart';
 import '../../medicines/screens/medicine_screen.dart';
-import '../../homecare/screens/nutrition_police_screen.dart';
+import '../../homecare/screens/symptom_diet_screen.dart';
 import '../../emergency/screens/emergency_screen.dart';
 import '../../chat/screens/ai_chat_screen.dart';
 import '../../neutrimap/screens/neutrimap_screen.dart';
@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 2: return const AiChatScreen();
       case 3: return const MedicineScreen();
       case 4: return const ProfileScreen();
-      default: return const _HomeTab(
+      default: return _HomeTab(
           userName: 'User', soloOn: false,
           onSoloToggle: null);
     }
@@ -560,7 +560,7 @@ class _MainModulesGrid extends StatelessWidget {
           const Color(0xFFBA7517),
           () => Navigator.push(context,
               MaterialPageRoute(builder: (_) =>
-                  NutritionPoliceScreen()))),
+                  const SymptomSelectorScreen()))),
     ];
 
     return GridView.count(
@@ -942,8 +942,7 @@ class _RecentRecords extends StatelessWidget {
         GestureDetector(
           onTap: () {
             final homeState =
-                context.findAncestorStateOfType<
-                    _HomeScreenState>();
+                context.findAncestorStateOfType<_HomeScreenState>();
             homeState?.setState(
                 () => homeState._tab = 1);
           },

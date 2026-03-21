@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '../../../core/theme/app_colors.dart';
 import '../widgets/sos_pulse_button.dart';
 import '../widgets/emergency_type_grid.dart';
@@ -27,6 +29,10 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
   bool   _isVoiceActive   = false;
   bool   _isTranslating   = false;
 
+  // Image submission fields
+  File? _evidenceImage;
+  bool _isAnalyzingImage = false;
+
   final _descController = TextEditingController();
 
   void _sendAlert() {
@@ -35,6 +41,39 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) setState(() { _isLoading = false; _alertSent = true; });
     });
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final image = await picker.pickImage(source: ImageSource.camera);
+    if (image != null) {
+      setState(() {
+        _evidenceImage = File(image.path);
+        _isAnalyzingImage = true;
+      });
+
+      // Simulate AI Visual Analysis
+      await Future.delayed(const Duration(seconds: 2));
+
+      setState(() {
+        _isAnalyzingImage = false;
+        _selectedType = 'Accident'; // Auto-detected
+        if (_descController.text.isEmpty) {
+          _descController.text = "Visual evidence of emergency captured. Nearest responders alerted with high priority.";
+        }
+      });
+      
+      _showSnack('Image analyzed! Emergency type updated to Accident.');
+    }
+  }
+
+  void _showSnack(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg),
+        backgroundColor: AppColors.navyMid,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12))));
   }
 
   @override
@@ -101,6 +140,71 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                           value: 'Jubilee Hills, Hyderabad — 500033',
                           readOnly: true,
                           suffixIcon: Icons.my_location_rounded,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Image Section (Optional)
+                    FadeInUp(
+                      delay: const Duration(milliseconds: 210),
+                      child: _FormGroup(
+                        label: 'PHOTO OF EMERGENCY (OPTIONAL)',
+                        child: GestureDetector(
+                          onTap: _pickImage,
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.05),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: AppColors.emergency.withOpacity(0.3), style: BorderStyle.solid),
+                            ),
+                            child: Column(
+                              children: [
+                                if (_evidenceImage == null) ...[
+                                  const Icon(Icons.add_a_photo_rounded, color: AppColors.emergency, size: 28),
+                                  const SizedBox(height: 8),
+                                  const Text('Capture/Upload Incident Photo', 
+                                    style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
+                                  const Text('Helps responders prepare better', 
+                                    style: TextStyle(color: Colors.white30, fontSize: 10)),
+                                ] else ...[
+                                  Row(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.file(_evidenceImage!, width: 50, height: 50, fit: BoxFit.cover),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            const Text('Evidence Attached', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                                            if (_isAnalyzingImage)
+                                              const Row(
+                                                children: [
+                                                  SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.emergency)),
+                                                  SizedBox(width: 8),
+                                                  Text('AI Scanning...', style: TextStyle(fontSize: 11, color: AppColors.emergency)),
+                                                ],
+                                              )
+                                            else
+                                              const Text('Visual context saved ✓', style: TextStyle(fontSize: 11, color: AppColors.teal)),
+                                          ],
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () => setState(() => _evidenceImage = null), 
+                                        icon: const Icon(Icons.close, color: Colors.white54, size: 18)
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ),

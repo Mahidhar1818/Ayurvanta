@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '../../../core/theme/app_colors.dart';
 
 // ═══════════════════════════════════════════════════════════
@@ -48,7 +50,8 @@ class Medicine {
 class CartItem {
   final Medicine medicine;
   int quantity;
-  CartItem({required this.medicine, this.quantity = 1});
+  bool isHighlighted;
+  CartItem({required this.medicine, this.quantity = 1, this.isHighlighted = false});
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -625,6 +628,8 @@ class _MedicineScreenState extends State<MedicineScreen> {
   String _query = '';
   String _selectedSpec = 'All';
   final Map<String, CartItem> _cart = {};
+  File? _prescriptionImage;
+  bool _isAnalyzing = false;
 
   static final List<String> _specializations = [
     'All', 'Cardiology', 'Diabetes', 'Gastroenterology',
@@ -665,12 +670,13 @@ class _MedicineScreenState extends State<MedicineScreen> {
   int get _cartCount =>
       _cart.values.fold(0, (sum, item) => sum + item.quantity);
 
-  void _addToCart(Medicine m) {
+  void _addToCart(Medicine m, {bool isHighlighted = false}) {
     setState(() {
       if (_cart.containsKey(m.id)) {
         _cart[m.id]!.quantity++;
+        if (isHighlighted) _cart[m.id]!.isHighlighted = true;
       } else {
-        _cart[m.id] = CartItem(medicine: m);
+        _cart[m.id] = CartItem(medicine: m, isHighlighted: isHighlighted);
       }
     });
     HapticFeedback.lightImpact();
@@ -684,6 +690,52 @@ class _MedicineScreenState extends State<MedicineScreen> {
         _cart.remove(id);
       }
     });
+  }
+
+  Future<void> _pickPrescription() async {
+    final picker = ImagePicker();
+    final image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _prescriptionImage = File(image.path);
+        _isAnalyzing = true;
+      });
+      
+      // Simulate AI analysis
+      await Future.delayed(const Duration(seconds: 3));
+      
+      // Mock highlights: Auto-add Amlodipine and Atorvastatin from DB
+      final amlo = allMedicines.firstWhere((m) => m.id == 'c001');
+      final ator = allMedicines.firstWhere((m) => m.id == 'c002');
+      
+      _addToCart(amlo, isHighlighted: true);
+      _addToCart(ator, isHighlighted: true);
+      
+      setState(() => _isAnalyzing = false);
+      
+      _showAnalysisResult();
+    }
+  }
+
+  void _showAnalysisResult() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Row(
+          children: [
+            Icon(Icons.auto_awesome, color: Colors.white, size: 18),
+            SizedBox(width: 8),
+            Text('Prescription analyzed! 2 medicines matched.'),
+          ],
+        ),
+        backgroundColor: AppColors.blue,
+        behavior: SnackBarBehavior.floating,
+        action: SnackBarAction(
+          label: 'VIEW',
+          textColor: Colors.white,
+          onPressed: () => _showCart(),
+        ),
+      ),
+    );
   }
 
   @override
@@ -708,8 +760,22 @@ class _MedicineScreenState extends State<MedicineScreen> {
           ),
         ],
       ),
-      floatingActionButton: _cartCount > 0
-          ? FadeInUp(
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (_cartCount == 0)
+            FadeInRight(
+              child: FloatingActionButton.extended(
+                onPressed: _pickPrescription,
+                backgroundColor: AppColors.blue,
+                icon: const Icon(Icons.upload_file_rounded),
+                label: const Text('Post Prescription (Optional)', 
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+              ),
+            ),
+          const SizedBox(height: 12),
+          if (_cartCount > 0)
+            FadeInUp(
               child: GestureDetector(
                 onTap: () => _showCart(),
                 child: Container(
@@ -742,8 +808,9 @@ class _MedicineScreenState extends State<MedicineScreen> {
                   ),
                 ),
               ),
-            )
-          : null,
+            ),
+        ],
+      ),
     );
   }
 
@@ -782,6 +849,14 @@ class _MedicineScreenState extends State<MedicineScreen> {
               ],
             ),
           ),
+          if (_isAnalyzing)
+            const Padding(
+              padding: EdgeInsets.only(right: 12),
+              child: SizedBox(
+                width: 20, height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.teal),
+              ),
+            ),
           if (_cartCount > 0)
             GestureDetector(
               onTap: () => _showCart(),
@@ -1371,8 +1446,9 @@ class _CartItemTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.bgPage,
+        color: item.isHighlighted ? const Color(0xFFE6F1FB) : AppColors.bgPage,
         borderRadius: BorderRadius.circular(12),
+        border: item.isHighlighted ? Border.all(color: AppColors.blue, width: 1) : null,
       ),
       child: Row(
         children: [
@@ -1383,6 +1459,9 @@ class _CartItemTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (item.isHighlighted)
+                  const Text('MATCHED FROM Rx ✨',
+                    style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, color: AppColors.blue)),
                 Text(item.medicine.name,
                     style: const TextStyle(
                         fontSize: 13,
