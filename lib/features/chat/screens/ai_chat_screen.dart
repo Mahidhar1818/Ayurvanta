@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:animate_do/animate_do.dart';
 import '../../../core/theme/app_colors.dart';
 import '../models/chat_message.dart';
@@ -14,15 +15,19 @@ class AiChatScreen extends StatefulWidget {
 }
 
 class _AiChatScreenState extends State<AiChatScreen> {
-  final _scrollController  = ScrollController();
-  final _inputController   = TextEditingController();
-  final List<ChatMessage>  _messages = [];
-  bool _isTyping = false;
+  final _scrollController = ScrollController();
+  final _inputController  = TextEditingController();
+  final List<ChatMessage> _messages = [];
+  bool _isTyping   = false;
+  bool _isCooling  = false;
+  int  _coolSeconds = 0;
+  Timer? _coolTimer;
 
   static const _suggestions = [
     '📋 Explain my ECG report',
     '💊 Side effects of Amlodipine',
-    '🩸 What does my blood sugar mean?',
+    '🩸 What does borderline HbA1c mean?',
+    '😴 I have chest pain since morning',
     '📞 Should I see a doctor today?',
     '🚨 Emergency help',
   ];
@@ -34,22 +39,43 @@ class _AiChatScreenState extends State<AiChatScreen> {
   }
 
   void _addWelcomeMessage() {
-    _messages.add(ChatMessage(
-      id: 'welcome',
-      text: "Hello Arjun! 👋 I'm AyurAI, your personal health assistant "
-          "powered by Gemini AI.\n\nI can help you understand your symptoms, "
-          "medications, and health reports. I also have access to your "
-          "medical history.\n\nHow can I help you today?",
-      role: MessageRole.ai,
-      timestamp: DateTime.now(),
-    ));
+    setState(() {
+      _messages.add(ChatMessage(
+        id: 'welcome',
+        text: "Hello Arjun! 👋 I'm AyurAI, your personal health "
+            "assistant powered by Google Gemini.\n\n"
+            "I have access to your medical history and can help "
+            "you understand symptoms, medications, and reports.\n\n"
+            "How can I help you today?",
+        role: MessageRole.ai,
+        timestamp: DateTime.now(),
+      ));
+    });
+  }
+
+  void _startCooldown(int seconds) {
+    setState(() { _isCooling = true; _coolSeconds = seconds; });
+    _coolTimer = Timer.periodic(const Duration(seconds: 1), (t) {
+      setState(() { _coolSeconds--; });
+      if (_coolSeconds <= 0) {
+        t.cancel();
+        setState(() { _isCooling = false; });
+      }
+    });
   }
 
   Future<void> _sendMessage(String text) async {
-    if (text.trim().isEmpty) return;
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return;
 
-    // Handle emergency shortcut
-    if (text.toLowerCase().contains('emergency')) {
+    if (_isCooling) {
+      _showCooldownSnack();
+      return;
+    }
+
+    // Emergency shortcut
+    if (trimmed.toLowerCase().contains('emergency') ||
+        trimmed.toLowerCase().contains('sos')) {
       Navigator.push(context, MaterialPageRoute(
         builder: (_) => const EmergencyScreen(),
       ));
@@ -58,7 +84,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
 
     final userMsg = ChatMessage(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      text: text.trim(),
+      text: trimmed,
       role: MessageRole.user,
       timestamp: DateTime.now(),
     );
@@ -72,16 +98,25 @@ class _AiChatScreenState extends State<AiChatScreen> {
     _scrollToBottom();
 
     try {
-      // Build history for Gemini (exclude welcome)
-      final history = _messages
-          .where((m) => m.id != 'welcome' && m.id != userMsg.id)
-          .map((m) => {
-                'role': m.role == MessageRole.ai ? 'ai' : 'user',
-                'text': m.text,
-              })
+      final rawHistory = _messages
+          .where((m) =>
+              m.id != 'welcome' &&
+              m.id != userMsg.id)
           .toList();
 
-      final reply = await GeminiService.sendMessage(history, text);
+      final history = <Map<String, String>>[];
+      MessageRole? lastRole;
+      for (final m in rawHistory) {
+        if (m.role != lastRole) {
+          history.add({
+            'role': m.role == MessageRole.ai ? 'ai' : 'user',
+            'text': m.text,
+          });
+          lastRole = m.role;
+        }
+      }
+
+      final reply = await GeminiService.chat(history, trimmed);
 
       if (mounted) {
         setState(() {
@@ -93,15 +128,16 @@ class _AiChatScreenState extends State<AiChatScreen> {
             timestamp: DateTime.now(),
           ));
         });
+        _startCooldown(3);
         _scrollToBottom();
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) {
         setState(() {
           _isTyping = false;
           _messages.add(ChatMessage(
-            id: 'error',
-            text: "Sorry, I couldn't connect right now. "
+            id: 'err_${DateTime.now().millisecondsSinceEpoch}',
+            text: "I'm having trouble connecting right now. "
                 "Please check your internet and try again. 🔄",
             role: MessageRole.ai,
             timestamp: DateTime.now(),
@@ -111,8 +147,21 @@ class _AiChatScreenState extends State<AiChatScreen> {
     }
   }
 
+  void _showCooldownSnack() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Please wait \$_coolSeconds seconds...'),
+        backgroundColor: AppColors.navyMid,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 1),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
   void _scrollToBottom() {
-    Future.delayed(const Duration(milliseconds: 100), () {
+    Future.delayed(const Duration(milliseconds: 120), () {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
@@ -125,6 +174,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
 
   @override
   void dispose() {
+    _coolTimer?.cancel();
     _scrollController.dispose();
     _inputController.dispose();
     super.dispose();
@@ -136,35 +186,8 @@ class _AiChatScreenState extends State<AiChatScreen> {
       backgroundColor: AppColors.bgPage,
       body: Column(
         children: [
-          _TopBar(),
-          // Disclaimer
-          FadeInDown(
-            child: Container(
-              margin: const EdgeInsets.fromLTRB(16, 10, 16, 0),
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFAEEDA),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.info_outline_rounded,
-                      size: 15, color: Color(0xFF854F0B)),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'AyurAI provides general guidance only. '
-                      'Not a substitute for professional medical advice.',
-                      style: TextStyle(fontSize: 11,
-                          color: Color(0xFF854F0B), height: 1.4),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          // Messages
+          _buildTopBar(),
+          _buildDisclaimer(),
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
@@ -181,26 +204,17 @@ class _AiChatScreenState extends State<AiChatScreen> {
               },
             ),
           ),
-          // Suggestion chips
           SuggestionChips(
             suggestions: _suggestions,
             onTap: _sendMessage,
           ),
-          // Input bar
-          _InputBar(
-            controller: _inputController,
-            onSend: _sendMessage,
-          ),
+          _buildInputBar(),
         ],
       ),
     );
   }
-}
 
-// ── Top Bar ──────────────────────────────────────────────
-class _TopBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildTopBar() {
     return Container(
       color: AppColors.navyDark,
       padding: EdgeInsets.only(
@@ -224,11 +238,11 @@ class _TopBar extends StatelessWidget {
           const SizedBox(width: 12),
           Container(
             width: 40, height: 40,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
                 colors: [Color(0xFF534AB7), Color(0xFF185FA5)],
               ),
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(50),
             ),
             child: const Icon(Icons.smart_toy_rounded,
                 color: Colors.white, size: 22),
@@ -241,7 +255,7 @@ class _TopBar extends StatelessWidget {
                 Text('AyurAI Doctor',
                   style: TextStyle(color: Colors.white,
                       fontSize: 15, fontWeight: FontWeight.w700)),
-                Text('● Online · Powered by Gemini',
+                Text('● Online · Powered by Gemini 1.5 Flash',
                   style: TextStyle(color: Color(0xFF1D9E75),
                       fontSize: 11, fontWeight: FontWeight.w600)),
               ],
@@ -263,23 +277,139 @@ class _TopBar extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildDisclaimer() {
+    return FadeInDown(
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+        padding: const EdgeInsets.symmetric(
+            horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFAEEDA),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: const Row(
+          children: [
+            Icon(Icons.info_outline_rounded,
+                size: 15, color: Color(0xFF854F0B)),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'AyurAI provides general guidance only. '
+                'Not a substitute for professional medical advice.',
+                style: TextStyle(fontSize: 11,
+                    color: Color(0xFF854F0B), height: 1.4),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInputBar() {
+    return Container(
+      padding: EdgeInsets.only(
+        left: 14, right: 14, top: 10,
+        bottom: MediaQuery.of(context).padding.bottom + 10,
+      ),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(
+            color: Color(0xFFE3EAF2), width: 0.5)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 36, height: 36,
+            decoration: BoxDecoration(
+              color: AppColors.bgPage,
+              borderRadius: BorderRadius.circular(50),
+              border: Border.all(
+                  color: const Color(0xFFE3EAF2), width: 0.5),
+            ),
+            child: const Icon(Icons.attach_file_rounded,
+                color: AppColors.textSecondary, size: 18),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              decoration: BoxDecoration(
+                color: AppColors.bgPage,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                    color: const Color(0xFFE3EAF2), width: 0.5),
+              ),
+              child: TextField(
+                controller: _inputController,
+                maxLines: 3, minLines: 1,
+                textInputAction: TextInputAction.send,
+                onSubmitted: _sendMessage,
+                style: const TextStyle(
+                    fontSize: 13, color: AppColors.textPrimary),
+                decoration: const InputDecoration(
+                  hintText: 'Describe your symptoms…',
+                  hintStyle: TextStyle(
+                      color: AppColors.textHint, fontSize: 13),
+                  border: InputBorder.none,
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 10),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          GestureDetector(
+            onTap: _isCooling
+                ? _showCooldownSnack
+                : () => _sendMessage(_inputController.text),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: 40, height: 40,
+              decoration: BoxDecoration(
+                color: _isCooling
+                    ? AppColors.textHint
+                    : AppColors.blue,
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: _isCooling
+                    ? Text(
+                        '\$_coolSeconds',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      )
+                    : const Icon(Icons.send_rounded,
+                        color: Colors.white, size: 18),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 // ── Typing Indicator ─────────────────────────────────────
 class _TypingIndicator extends StatefulWidget {
   const _TypingIndicator();
   @override
-  State<_TypingIndicator> createState() => _TypingIndicatorState();
+  State<_TypingIndicator> createState() =>
+      _TypingIndicatorState();
 }
 
 class _TypingIndicatorState extends State<_TypingIndicator>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+  late AnimationController _ctrl;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    _ctrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
     )..repeat();
@@ -287,7 +417,7 @@ class _TypingIndicatorState extends State<_TypingIndicator>
 
   @override
   void dispose() {
-    _controller.dispose();
+    _ctrl.dispose();
     super.dispose();
   }
 
@@ -327,12 +457,12 @@ class _TypingIndicatorState extends State<_TypingIndicator>
               mainAxisSize: MainAxisSize.min,
               children: List.generate(3, (i) =>
                 AnimatedBuilder(
-                  animation: _controller,
+                  animation: _ctrl,
                   builder: (_, __) {
-                    final offset = ((_controller.value * 3) - i)
+                    final t = ((_ctrl.value * 3) - i)
                         .clamp(0.0, 1.0);
-                    final bounce = offset < 0.5
-                        ? offset * 2 : (1 - offset) * 2;
+                    final bounce =
+                        t < 0.5 ? t * 2 : (1 - t) * 2;
                     return Container(
                       margin: const EdgeInsets.symmetric(
                           horizontal: 2),
@@ -340,8 +470,7 @@ class _TypingIndicatorState extends State<_TypingIndicator>
                       decoration: BoxDecoration(
                         color: Color.lerp(
                           const Color(0xFF8BAED4),
-                          AppColors.blue,
-                          bounce,
+                          AppColors.blue, bounce,
                         ),
                         shape: BoxShape.circle,
                       ),
@@ -351,87 +480,6 @@ class _TypingIndicatorState extends State<_TypingIndicator>
                   },
                 ),
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _InputBar extends StatelessWidget {
-  final TextEditingController controller;
-  final ValueChanged<String> onSend;
-  const _InputBar({required this.controller, required this.onSend});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-        left: 14, right: 14, top: 10,
-        bottom: MediaQuery.of(context).padding.bottom + 10,
-      ),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(
-            top: BorderSide(color: Color(0xFFE3EAF2), width: 0.5)),
-      ),
-      child: Row(
-        children: [
-          // Attach button
-          Container(
-            width: 36, height: 36,
-            decoration: BoxDecoration(
-              color: AppColors.bgPage,
-              borderRadius: BorderRadius.circular(50),
-              border: Border.all(
-                  color: const Color(0xFFE3EAF2), width: 0.5),
-            ),
-            child: const Icon(Icons.attach_file_rounded,
-                color: AppColors.textSecondary, size: 18),
-          ),
-          const SizedBox(width: 10),
-          // Text field
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              decoration: BoxDecoration(
-                color: AppColors.bgPage,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                    color: const Color(0xFFE3EAF2), width: 0.5),
-              ),
-              child: TextField(
-                controller: controller,
-                maxLines: 3,
-                minLines: 1,
-                textInputAction: TextInputAction.send,
-                onSubmitted: onSend,
-                style: const TextStyle(
-                    fontSize: 13, color: AppColors.textPrimary),
-                decoration: const InputDecoration(
-                  hintText: 'Describe your symptoms…',
-                  hintStyle: TextStyle(
-                      color: AppColors.textHint, fontSize: 13),
-                  border: InputBorder.none,
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 10),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          // Send button
-          GestureDetector(
-            onTap: () => onSend(controller.text),
-            child: Container(
-              width: 40, height: 40,
-              decoration: const BoxDecoration(
-                color: AppColors.blue,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.send_rounded,
-                  color: Colors.white, size: 18),
             ),
           ),
         ],

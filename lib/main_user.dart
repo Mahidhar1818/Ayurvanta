@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'features/auth/screens/splash_screen.dart';
+import 'features/onboarding/screens/splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: '.env');
+  // Removed dotenv — API key is directly in GeminiService
   runApp(const AyurVantaApp());
 }
 
 class AyurVantaApp extends StatelessWidget {
   const AyurVantaApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,7 +18,6 @@ class AyurVantaApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         scaffoldBackgroundColor: const Color(0xFF0B1A2C),
-        fontFamily: 'SF Pro Display',
       ),
       home: const SplashScreen(),
     );
