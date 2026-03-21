@@ -1,10 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'core/translations/app_translations.dart';
 import 'features/onboarding/screens/splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Removed dotenv — API key is directly in GeminiService
-  runApp(const AyurVantaApp());
+  
+  // Load environment variables
+  await dotenv.load(fileName: '.env');
+  
+  final translations = AppTranslations.instance;
+  await translations.load();
+  
+  runApp(
+    ChangeNotifierProvider.value(
+      value: translations,
+      child: const AyurVantaApp(),
+    ),
+  );
 }
 
 class AyurVantaApp extends StatelessWidget {
@@ -18,6 +32,7 @@ class AyurVantaApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         scaffoldBackgroundColor: const Color(0xFF0B1A2C),
+        fontFamily: 'SF Pro Display',
       ),
       home: const SplashScreen(),
     );

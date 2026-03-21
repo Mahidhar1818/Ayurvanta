@@ -5,6 +5,9 @@ import '../../../core/theme/app_colors.dart';
 import '../widgets/sos_pulse_button.dart';
 import '../widgets/emergency_type_grid.dart';
 import '../widgets/dispatch_status_card.dart';
+import '../../../core/services/voice_translation_service.dart';
+import '../../../core/widgets/voice_mic_button.dart';
+import '../../../core/widgets/voice_wave_bars.dart';
 
 class EmergencyScreen extends StatefulWidget {
   const EmergencyScreen({super.key});
@@ -17,6 +20,12 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
   String _description    = '';
   bool   _alertSent      = false;
   bool   _isLoading      = false;
+
+  // Voice fields
+  String _voiceSpoken     = '';
+  String _voiceTranslated = '';
+  bool   _isVoiceActive   = false;
+  bool   _isTranslating   = false;
 
   final _descController = TextEditingController();
 
@@ -92,6 +101,164 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                           value: 'Jubilee Hills, Hyderabad — 500033',
                           readOnly: true,
                           suffixIcon: Icons.my_location_rounded,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Voice input section
+                    FadeInUp(
+                      delay: const Duration(milliseconds: 220),
+                      child: _FormGroup(
+                        label: 'SPEAK YOUR EMERGENCY',
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.06),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.12),
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  const Expanded(
+                                    child: Text(
+                                      'Speak in any language.\n'
+                                      'We will translate and alert hospitals.',
+                                      style: TextStyle(
+                                        color: Colors.white54,
+                                        fontSize: 12,
+                                        height: 1.5,
+                                      ),
+                                    ),
+                                  ),
+                                  VoiceMicButton(
+                                    size: 64,
+                                    color: AppColors.emergency,
+                                    onResult: (spoken, locale) async {
+                                      setState(() {
+                                        _voiceSpoken    = spoken;
+                                        _isTranslating  = true;
+                                        _isVoiceActive  = false;
+                                      });
+
+                                      // Translate
+                                      final translated =
+                                        await VoiceTranslationService
+                                            .translateToEnglish(spoken);
+
+                                      // Generate emergency summary
+                                      final summary =
+                                        await VoiceTranslationService
+                                            .generateEmergencySummary(translated);
+
+                                      setState(() {
+                                        _voiceTranslated = summary;
+                                        _isTranslating   = false;
+                                        // Auto-fill description
+                                        _descController.text = summary;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                              VoiceWaveBars(
+                                isActive: _isVoiceActive,
+                                color: AppColors.emergency,
+                              ),
+                              if (_voiceSpoken.isNotEmpty) ...[
+                                const SizedBox(height: 10),
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.06),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text('YOU SAID',
+                                        style: TextStyle(
+                                          color: Colors.white38,
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.w700,
+                                          letterSpacing: 0.8,
+                                        )),
+                                      const SizedBox(height: 4),
+                                      Text(_voiceSpoken,
+                                        style: const TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 12,
+                                          fontStyle: FontStyle.italic,
+                                          height: 1.4,
+                                        )),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                              if (_isTranslating)
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 10),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    children: [
+                                      SizedBox(
+                                        width: 14, height: 14,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: AppColors.emergency,
+                                        ),
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text('Translating & summarizing...',
+                                        style: TextStyle(
+                                          color: Colors.white54, fontSize: 12)),
+                                    ],
+                                  ),
+                                ),
+                              if (_voiceTranslated.isNotEmpty &&
+                                  !_isTranslating) ...[
+                                const SizedBox(height: 10),
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.teal.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: AppColors.teal.withOpacity(0.3),
+                                      width: 0.5,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text('SENT TO HOSPITALS (ENGLISH)',
+                                        style: TextStyle(
+                                          color: AppColors.teal,
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.w700,
+                                          letterSpacing: 0.8,
+                                        )),
+                                      const SizedBox(height: 4),
+                                      Text(_voiceTranslated,
+                                        style: const TextStyle(
+                                          color: Color(0xFF9FE1CB),
+                                          fontSize: 12,
+                                          height: 1.4,
+                                        )),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
                         ),
                       ),
                     ),

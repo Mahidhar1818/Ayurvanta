@@ -1,14 +1,27 @@
 import 'package:flutter/material.dart';
+import 'core/translations/app_translations.dart';
 import 'features/onboarding/screens/splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Removed dotenv — API key is directly in GeminiService
+  await AppTranslations.instance.load();
   runApp(const AyurVantaApp());
 }
 
-class AyurVantaApp extends StatelessWidget {
+class AyurVantaApp extends StatefulWidget {
   const AyurVantaApp({super.key});
+  @override
+  State<AyurVantaApp> createState() => _AyurVantaAppState();
+}
+
+class _AyurVantaAppState extends State<AyurVantaApp> {
+  @override
+  void initState() {
+    super.initState();
+    AppTranslations.instance.addListener(() {
+      if (mounted) setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

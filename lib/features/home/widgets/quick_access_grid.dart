@@ -3,6 +3,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../appointments/screens/doctor_list_screen.dart';
 import '../../chat/screens/ai_chat_screen.dart';
 import '../../pharmacy/screens/pharmacy_screen.dart';
+import '../../opd/screens/opd_registration_screen.dart';
 
 class QuickAccessGrid extends StatelessWidget {
   const QuickAccessGrid({super.key});
@@ -10,12 +11,12 @@ class QuickAccessGrid extends StatelessWidget {
   final _items = const [
     {'icon': Icons.local_hospital_outlined, 'label': 'Book Appt',
      'bg': AppColors.blueLight, 'color': AppColors.blue},
+    {'icon': Icons.assignment_outlined, 'label': 'OPD Reg',
+     'bg': Color(0xFFEEEDFE), 'color': Color(0xFF534AB7)},
     {'icon': Icons.medication_outlined, 'label': 'Medicines',
      'bg': Color(0xFFEAF3DE), 'color': AppColors.teal},
-    {'icon': Icons.science_outlined, 'label': 'Lab Tests',
-     'bg': Color(0xFFFAEEDA), 'color': Color(0xFFBA7517)},
     {'icon': Icons.smart_toy_outlined, 'label': 'AI Doctor',
-     'bg': Color(0xFFEEEDFE), 'color': Color(0xFF534AB7)},
+     'bg': Color(0xFFFAEEDA), 'color': Color(0xFFBA7517)},
   ];
 
   @override
@@ -28,6 +29,10 @@ class QuickAccessGrid extends StatelessWidget {
               if (item['label'] == 'Book Appt') {
                 Navigator.push(context, MaterialPageRoute(
                   builder: (_) => const DoctorListScreen(),
+                ));
+              } else if (item['label'] == 'OPD Reg') {
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => const OpdRegistrationScreen(),
                 ));
               } else if (item['label'] == 'Medicines') {
                 Navigator.push(context, MaterialPageRoute(
