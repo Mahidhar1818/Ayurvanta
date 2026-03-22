@@ -33,7 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    initNotifications(); // initialize notifications at startup
     _loadUser();
   }
 
@@ -886,6 +885,11 @@ class _ExploreRow extends StatelessWidget {
           () => Navigator.push(context,
               MaterialPageRoute(builder: (_) =>
                   const SchemesScreen()))),
+      ('🥗', context.tr('diet_map'),
+          const Color(0xFFEAF3DE),
+          () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) =>
+                  const DietMapScreen()))),
       ('💼', context.tr('opportunities'),
           const Color(0xFFEEEDFE),
           () => Navigator.push(context,
@@ -893,38 +897,38 @@ class _ExploreRow extends StatelessWidget {
                   const OpportunitiesScreen()))),
     ];
 
-    return Row(
+    return Column(
       children: items.map((item) =>
-        Expanded(
-          child: GestureDetector(
-            onTap: item.$4,
-            child: Container(
-              margin: const EdgeInsets.symmetric(
-                  horizontal: 4),
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: item.$3,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Row(
-                children: [
-                  Text(item.$1,
-                      style: const TextStyle(
-                          fontSize: 22)),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(item.$2,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
-                      ))),
-                  const Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      size: 12,
-                      color: AppColors.textHint),
-                ],
-              ),
+        GestureDetector(
+          onTap: item.$4,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: item.$3,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                  color: const Color(0xFFE3EAF2),
+                  width: 0.5),
+            ),
+            child: Row(
+              children: [
+                Text(item.$1,
+                    style: const TextStyle(
+                        fontSize: 24)),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Text(item.$2,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ))),
+                const Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 14,
+                    color: AppColors.textHint),
+              ],
             ),
           ),
         ),

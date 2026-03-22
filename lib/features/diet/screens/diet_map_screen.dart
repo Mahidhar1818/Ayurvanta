@@ -448,14 +448,15 @@ class _DietCardState extends State<_DietCard> {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis),
                         const SizedBox(height: 8),
-                        Row(
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 4,
                           children: [
                             _Tag(
                               icon: Icons.local_fire_department,
                               text: '${widget.t.tr('calories')}: ${widget.item.calories}',
                               t: widget.t,
                             ),
-                            const SizedBox(width: 8),
                             _Tag(
                               icon: Icons.favorite,
                               text: widget.t.tr(widget.item.benefitsKey).split(',').first,
@@ -527,10 +528,12 @@ class _DietCardState extends State<_DietCard> {
                         const Icon(Icons.access_time, size: 14,
                             color: Color(0xFF1D9E75)),
                         const SizedBox(width: 8),
-                        Text('${widget.t.tr('best_time')}: ${_getBestTime(widget.item.category)}',
-                            style: const TextStyle(fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF1D9E75))),
+                        Expanded(
+                          child: Text('${widget.t.tr('best_time')}: ${_getBestTime(widget.item.category)}',
+                              style: const TextStyle(fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF1D9E75))),
+                        ),
                       ],
                     ),
                   ),
@@ -581,10 +584,13 @@ class _Tag extends StatelessWidget {
         children: [
           Icon(icon, size: 10, color: AppColors.textSecondary),
           const SizedBox(width: 4),
-          Text(text,
-              style: const TextStyle(fontSize: 10,
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w500)),
+          Flexible(
+            child: Text(text,
+                style: const TextStyle(fontSize: 10,
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w500),
+                overflow: TextOverflow.ellipsis),
+          ),
         ],
       ),
     );
