@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
 import 'core/translations/app_translations.dart';
 import 'features/onboarding/screens/splash_screen.dart';
+import 'features/pharmacy/providers/cart_provider.dart';
+import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppTranslations.instance.load();
-  runApp(const AyurVantaApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+      ],
+      child: const AyurVantaApp(),
+    ),
+  );
 }
 
 class AyurVantaApp extends StatefulWidget {

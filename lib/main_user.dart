@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/translations/app_translations.dart';
 import 'features/onboarding/screens/splash_screen.dart';
-
+import 'features/pharmacy/providers/cart_provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -14,8 +14,11 @@ Future<void> main() async {
   await translations.load();
   
   runApp(
-    ChangeNotifierProvider.value(
-      value: translations,
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: translations),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+      ],
       child: const AyurVantaApp(),
     ),
   );

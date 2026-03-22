@@ -300,6 +300,7 @@ class _DietMapScreenState extends State<DietMapScreen> {
                 ),
               ),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(region['icon']!, style: const TextStyle(fontSize: 24)),

@@ -7,7 +7,7 @@ import '../../../core/translations/tr_extension.dart';
 import '../../appointments/screens/op_booking_screen.dart';
 import '../../consultation/screens/consultation_screen.dart';
 import '../../medicines/screens/medicine_screen.dart';
-import '../../homecare/screens/symptom_diet_screen.dart';
+import '../../homecare/screens/home_checkup_screen.dart';
 import '../../emergency/screens/emergency_screen.dart';
 import '../../chat/screens/ai_chat_screen.dart';
 import '../../diet/screens/diet_map_screen.dart';
@@ -571,7 +571,7 @@ class _MainModulesGrid extends StatelessWidget {
           const Color(0xFFBA7517),
           () => Navigator.push(context,
               MaterialPageRoute(builder: (_) =>
-                  const SymptomSelectorScreen()))),
+                  const HomeCheckupScreen()))),
       (Icons.sensors_rounded,
           'Sensor SOS',
           const Color(0xFFFCEBEB), AppColors.emergency,
