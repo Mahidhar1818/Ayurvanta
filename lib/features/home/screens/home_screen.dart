@@ -170,6 +170,8 @@ class _BottomNav extends StatelessWidget {
                             : AppColors.textHint),
                       const SizedBox(height: 3),
                       Text(e.value.$2,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
@@ -249,7 +251,7 @@ class _HomeTab extends StatelessWidget {
                         milliseconds: 100),
                     child: _MainModulesGrid(),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
 
                   // Health services
                   FadeInUp(
@@ -264,7 +266,7 @@ class _HomeTab extends StatelessWidget {
                         milliseconds: 200),
                     child: _HealthServicesRow(),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
 
                   // Upcoming appointment
                   FadeInUp(
@@ -279,7 +281,7 @@ class _HomeTab extends StatelessWidget {
                         milliseconds: 300),
                     child: _UpcomingApptCard(),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
 
                   // Health Summary
                   FadeInUp(
@@ -294,7 +296,7 @@ class _HomeTab extends StatelessWidget {
                         milliseconds: 400),
                     child: _HealthStatusGrid(),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
 
                   // Explore
                   FadeInUp(
@@ -309,7 +311,7 @@ class _HomeTab extends StatelessWidget {
                         milliseconds: 500),
                     child: _ExploreRow(),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
 
                   // Recent records
                   FadeInUp(
@@ -374,6 +376,8 @@ class _TopBar extends StatelessWidget {
                           fontSize: 12)),
                     const SizedBox(height: 2),
                     Text(userName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,
@@ -400,6 +404,7 @@ class _TopBar extends StatelessWidget {
                   ],
                 ),
               ),
+              const SizedBox(width: 12),
               Column(
                 children: [
                   const CircleAvatar(
@@ -480,10 +485,14 @@ class _TopBar extends StatelessWidget {
                       color: AppColors.textHint,
                       size: 18),
                   const SizedBox(width: 10),
-                  Text(context.tr('search_hint'),
-                    style: const TextStyle(
-                        color: AppColors.textHint,
-                        fontSize: 13)),
+                  Expanded(
+                    child: Text(context.tr('search_hint'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          color: AppColors.textHint,
+                          fontSize: 13)),
+                  ),
                 ],
               ),
             ),
@@ -570,19 +579,24 @@ class _MainModulesGrid extends StatelessWidget {
               builder: (_) => const SensorSosScreen()))),
     ];
 
-    return GridView.count(
-      crossAxisCount: 2,
+    return GridView.builder(
+      padding: EdgeInsets.zero,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisSpacing: 10,
-      mainAxisSpacing: 10,
-      childAspectRatio: 2.2,
-      children: items.map((item) =>
-        GestureDetector(
+      itemCount: items.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 2.2,
+      ),
+      itemBuilder: (context, i) {
+        final item = items[i];
+        return GestureDetector(
           onTap: item.$5,
           child: Container(
             padding: const EdgeInsets.symmetric(
-                horizontal: 14, vertical: 10),
+                horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(14),
@@ -593,33 +607,36 @@ class _MainModulesGrid extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  width: 38, height: 38,
+                  width: 36, height: 36,
                   decoration: BoxDecoration(
                     color: item.$3,
                     borderRadius:
                         BorderRadius.circular(10),
                   ),
                   child: Icon(item.$1,
-                      color: item.$4, size: 20),
+                      color: item.$4, size: 18),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(item.$2,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 11,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
+                      height: 1.2,
                     )),
                 ),
                 const Icon(
                     Icons.arrow_forward_ios_rounded,
-                    size: 12,
+                    size: 10,
                     color: AppColors.textHint),
               ],
             ),
           ),
-        ),
-      ).toList(),
+        );
+      },
     );
   }
 }
@@ -656,7 +673,7 @@ class _HealthServicesRow extends StatelessWidget {
               margin: const EdgeInsets.symmetric(
                   horizontal: 4),
               padding: const EdgeInsets.symmetric(
-                  vertical: 12),
+                  vertical: 12, horizontal: 4),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
@@ -672,6 +689,8 @@ class _HealthServicesRow extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(item.$2,
                     textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 9,
                       fontWeight: FontWeight.w600,
@@ -730,6 +749,8 @@ class _UpcomingApptCard extends StatelessWidget {
                         CrossAxisAlignment.start,
                     children: [
                       Text('Dr. Ravi Kumar',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
@@ -738,12 +759,15 @@ class _UpcomingApptCard extends StatelessWidget {
                       SizedBox(height: 2),
                       Text(
                         'Cardiologist · Apollo Hospital',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                             fontSize: 11,
                             color: AppColors.textSecondary)),
                     ],
                   ),
                 ),
+                const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 10, vertical: 4),
@@ -765,27 +789,30 @@ class _UpcomingApptCard extends StatelessWidget {
             const Divider(
                 color: Color(0xFFF0F4F8), height: 1),
             const SizedBox(height: 10),
-            Row(
-              children: [
-                const Icon(
-                    Icons.calendar_today_outlined,
-                    size: 13,
-                    color: AppColors.textSecondary),
-                const SizedBox(width: 5),
-                const Text('Tomorrow, Mar 22',
-                  style: TextStyle(
-                      fontSize: 11,
-                      color: AppColors.textSecondary)),
-                const SizedBox(width: 16),
-                const Icon(Icons.access_time_rounded,
-                    size: 13,
-                    color: AppColors.textSecondary),
-                const SizedBox(width: 5),
-                const Text('10:30 AM',
-                  style: TextStyle(
-                      fontSize: 11,
-                      color: AppColors.textSecondary)),
-              ],
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  const Icon(
+                      Icons.calendar_today_outlined,
+                      size: 13,
+                      color: AppColors.textSecondary),
+                  const SizedBox(width: 5),
+                  const Text('Tomorrow, Mar 22',
+                    style: TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textSecondary)),
+                  const SizedBox(width: 16),
+                  const Icon(Icons.access_time_rounded,
+                      size: 13,
+                      color: AppColors.textSecondary),
+                  const SizedBox(width: 5),
+                  const Text('10:30 AM',
+                    style: TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textSecondary)),
+                ],
+              ),
             ),
           ],
         ),
@@ -810,6 +837,7 @@ class _HealthStatusGrid extends StatelessWidget {
     ];
 
     return GridView.count(
+      padding: EdgeInsets.zero,
       crossAxisCount: 2,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -820,7 +848,7 @@ class _HealthStatusGrid extends StatelessWidget {
         final isWarn = item.$5;
         return Container(
           padding: const EdgeInsets.symmetric(
-              horizontal: 14, vertical: 12),
+              horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(14),
@@ -835,6 +863,8 @@ class _HealthStatusGrid extends StatelessWidget {
                 MainAxisAlignment.center,
             children: [
               Text(item.$1,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                     fontSize: 11,
                     color: AppColors.textSecondary)),
@@ -844,24 +874,29 @@ class _HealthStatusGrid extends StatelessWidget {
                     CrossAxisAlignment.baseline,
                 textBaseline: TextBaseline.alphabetic,
                 children: [
-                  Text(item.$2,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                    )),
+                  Flexible(
+                    child: Text(item.$2,
+                      maxLines: 1,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      )),
+                  ),
                   Text(item.$3,
                     style: const TextStyle(
-                        fontSize: 11,
+                        fontSize: 10,
                         color: AppColors.textSecondary)),
                 ],
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               Text(
                 isWarn ? '⚠ ${item.$4}'
                     : '✓ ${item.$4}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 10,
                   fontWeight: FontWeight.w600,
                   color: isWarn
                       ? const Color(0xFF854F0B)
@@ -919,6 +954,8 @@ class _ExploreRow extends StatelessWidget {
                 const SizedBox(width: 14),
                 Expanded(
                   child: Text(item.$2,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -979,11 +1016,14 @@ class _RecentRecords extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(r.$1,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ))),
+                const SizedBox(width: 8),
                 Text(r.$2,
                   style: const TextStyle(
                       fontSize: 11,
