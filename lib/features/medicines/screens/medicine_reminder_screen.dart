@@ -561,7 +561,7 @@ class _MedicineReminderScreenState extends State<MedicineReminderScreen>
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

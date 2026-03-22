@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class MedicineReminder {
   final String id;
   final String name;
@@ -38,7 +40,6 @@ class MedicineReminder {
 
   String get nextDoseTime {
     if (times.isEmpty) return '--';
-    import('package:flutter/material.dart');
     final now = TimeOfDay.now(); // We will use a workaround or dummy logic if TimeOfDay isn't resolved since we need Material import in the model
     for (final t in times) {
       final parts = t.split(':');
