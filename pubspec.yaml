@@ -19,7 +19,7 @@ dependencies:
   google_sign_in: ^6.2.1
   shared_preferences: ^2.2.3
   flutter_secure_storage: ^9.0.0
-  geolocator: ^14.0.2
+  geolocator: ^11.1.0
   permission_handler: ^11.3.0
   provider: ^6.1.2
   speech_to_text: ^7.0.0
@@ -30,6 +30,11 @@ dependencies:
   shimmer: ^3.0.0
   avatar_glow: ^3.0.0
   url_launcher: ^6.3.2
+  flutter_local_notifications: ^17.2.2
+  audioplayers: ^6.0.0
+  timezone: ^0.9.4
+  sensors_plus: ^4.0.2
+  flutter_blue_plus: ^1.31.7
 
 dev_dependencies:
   flutter_test:

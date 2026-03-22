@@ -16,6 +16,8 @@ import '../../opportunities/screens/opportunities_screen.dart';
 import '../../records/screens/records_screen.dart';
 import '../../profile/screens/profile_screen.dart';
 import '../../solo_safety/screens/solo_safety_screen.dart';
+import '../../solo_safety/screens/sensor_sos_screen.dart';
+import '../../medicines/screens/medicine_reminder_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -31,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    initNotifications(); // initialize notifications at startup
     _loadUser();
   }
 
@@ -561,6 +564,11 @@ class _MainModulesGrid extends StatelessWidget {
           () => Navigator.push(context,
               MaterialPageRoute(builder: (_) =>
                   const SymptomSelectorScreen()))),
+      (Icons.sensors_rounded,
+          'Sensor SOS',
+          const Color(0xFFFCEBEB), AppColors.emergency,
+          () => Navigator.push(context, MaterialPageRoute(
+              builder: (_) => const SensorSosScreen()))),
     ];
 
     return GridView.count(
@@ -626,10 +634,10 @@ class _HealthServicesRow extends StatelessWidget {
           () => Navigator.push(context,
               MaterialPageRoute(builder: (_) =>
                   const AiChatScreen()))),
-      ('🥗', 'Neutrimap',
+      ('💊', 'Med Reminders',
           () => Navigator.push(context,
               MaterialPageRoute(builder: (_) =>
-                  const DietMapScreen()))),
+                  const MedicineReminderScreen()))),
       ('🚑', context.tr('ambulance_module'),
           () => Navigator.push(context,
               MaterialPageRoute(builder: (_) =>
