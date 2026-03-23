@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../models/medicine_model.dart';
+import '../../shared/screens/payment_screen.dart';
 
 class CartSheet extends StatelessWidget {
   final List<String> cartIds;
@@ -147,7 +148,29 @@ class CartSheet extends StatelessWidget {
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  if (_items.isEmpty) return;
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => PaymentScreen(
+                        total: _total,
+                        itemCount: _items.length,
+                        onSuccess: () {
+                          // After payment is successful, pop the cart sheet
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Order placed successfully! Details appear in My Orders.'),
+                              backgroundColor: AppColors.teal,
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.teal,
                   foregroundColor: Colors.white,

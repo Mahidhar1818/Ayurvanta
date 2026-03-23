@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 
 class VoiceTranslationService {
   // Uses Gemini to translate any Indian language to English
-  static const _apiKey = 'AIzaSyCn6Fe17Pd1ipAeGv8oM0rcOyEdmtFtlWw';
+  static const _apiKey = 'AIzaSyBvj7JbvTqSQM2EhA-DcLifCyk7Czgzj-s';
   static const _url =
       'https://generativelanguage.googleapis.com/v1beta'
       '/models/gemini-2.0-flash:generateContent';

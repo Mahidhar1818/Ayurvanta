@@ -238,6 +238,9 @@ class AppTranslations extends ChangeNotifier {
       'smoked_pork': 'Smoked Pork with Bamboo',
       'smoked_pork_desc': 'Traditional preparation with local herbs',
       'smoked_pork_benefits': 'High protein, minimal processed ingredients',
+      'home_visit': 'Home Visit',
+      'sensor_sos': 'Sensor SOS',
+      'med_reminders': 'Med Reminders',
     },
 
     // ─── TELUGU ────────────────────────────────────────────
@@ -412,6 +415,9 @@ class AppTranslations extends ChangeNotifier {
       'punjabi_thali_benefits': 'అధిక ప్రోటీన్, సంక్లిష్ట కార్బోహైడ్రేట్లు, సమతుల్య పోషకాహారం',
       'punjabi_thali_ingredients': 'గోధుమ పిండి, ఉడికించిన పప్పు, మిక్స్ వెజిటబుల్స్, పెరుగు',
       'punjabi_thali_prep': 'రొట్టెలు తాజాగా చేసి, దాల్ మఖానీతో సర్వ్ చేయండి. కూరగాయలు మరియు సలాడ్ జోడించండి.',
+      'home_visit': 'ఇంటి సందర్శన',
+      'sensor_sos': 'సెన్సార్ SOS',
+      'med_reminders': 'మందుల రిమైండర్లు',
     },
 
     // ─── HINDI ─────────────────────────────────────────────
@@ -622,6 +628,9 @@ class AppTranslations extends ChangeNotifier {
       'smoked_pork': 'बैम्बू के साथ स्मोक्ड पोर्क',
       'smoked_pork_desc': 'स्थानीय जड़ी-बूटियों के साथ पारंपरिक तैयारी',
       'smoked_pork_benefits': 'उच्च प्रोटीन, न्यूनतम प्रसंस्कृत सामग्री',
+      'home_visit': 'होम विजिट',
+      'sensor_sos': 'सेंसर SOS',
+      'med_reminders': 'दवा रिमाइंडर्स',
     },
 
     // ─── TAMIL ─────────────────────────────────────────────
@@ -757,6 +766,9 @@ class AppTranslations extends ChangeNotifier {
       'delivery': 'டெலிவரி',
       'ambulance_module': 'ஆம்புலன்ஸ்',
       'nearby_hospitals': 'அருகிலுள்ள மருத்துவமனைகள்',
+      'home_visit': 'வீட்டு வருகை',
+      'sensor_sos': 'சென்சார் SOS',
+      'med_reminders': 'மருந்து நினைவூட்டல்கள்',
     },
 
     // ─── MARATHI ───────────────────────────────────────────
@@ -892,6 +904,9 @@ class AppTranslations extends ChangeNotifier {
       'nearby_hospitals': 'जवळचे रुग्णालय',
       'search_doctor_hint': 'नाव, विशेषतेनुसार शोधा…',
       'doctors_available': 'डॉक्टर उपलब्ध आहेत',
+      'home_visit': 'होम व्हिजिट',
+      'sensor_sos': 'सेन्सर एसओएस',
+      'med_reminders': 'औषध स्मरणपत्रे',
     },
 
     // ─── KANNADA ───────────────────────────────────────────

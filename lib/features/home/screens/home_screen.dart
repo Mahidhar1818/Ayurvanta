@@ -18,6 +18,7 @@ import '../../profile/screens/profile_screen.dart';
 import '../../solo_safety/screens/solo_safety_screen.dart';
 import '../../solo_safety/screens/sensor_sos_screen.dart';
 import '../../medicines/screens/medicine_reminder_screen.dart';
+import '../../housecalls/screens/house_calls_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -572,8 +573,15 @@ class _MainModulesGrid extends StatelessWidget {
           () => Navigator.push(context,
               MaterialPageRoute(builder: (_) =>
                   const HomeCheckupScreen()))),
+      (Icons.medical_services_outlined,
+          context.tr('home_visit'),
+          const Color(0xFFE8F4F8),
+          const Color(0xFF00B4D8),
+          () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) =>
+                  const HouseCallsScreen()))),
       (Icons.sensors_rounded,
-          'Sensor SOS',
+          context.tr('sensor_sos'),
           const Color(0xFFFCEBEB), AppColors.emergency,
           () => Navigator.push(context, MaterialPageRoute(
               builder: (_) => const SensorSosScreen()))),
@@ -650,7 +658,7 @@ class _HealthServicesRow extends StatelessWidget {
           () => Navigator.push(context,
               MaterialPageRoute(builder: (_) =>
                   const AiChatScreen()))),
-      ('💊', 'Med Reminders',
+      ('💊', context.tr('med_reminders'),
           () => Navigator.push(context,
               MaterialPageRoute(builder: (_) =>
                   const MedicineReminderScreen()))),

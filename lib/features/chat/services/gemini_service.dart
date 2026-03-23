@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 class GeminiService {
   static const _apiKey =
-      'AIzaSyCn6Fe17Pd1ipAeGv8oM0rcOyEdmtFtlWw';
+      'AIzaSyBvj7JbvTqSQM2EhA-DcLifCyk7Czgzj-s';
 
   // gemini-2.0-flash is the correct working model as of 2026
   static const _url =

@@ -276,7 +276,7 @@ class _DietMapScreenState extends State<DietMapScreen> {
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.symmetric(vertical: 12),
-      height: 110,
+      height: 120,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),

@@ -23,6 +23,12 @@ class _OpFormScreenState extends State<OpFormScreen> {
   final _ageCtrl     = TextEditingController();
   final _symptomsCtrl= TextEditingController();
   String _selectedSpec = '';
+  String _selectedTimeSlot = '';
+  
+  static const _timeSlots = [
+    '09:00 AM', '10:00 AM', '11:30 AM', 
+    '01:00 PM', '02:30 PM', '04:00 PM', '05:30 PM'
+  ];
   bool _useVoice     = false;
   bool _isTranslating= false;
   String _voiceText  = '';
@@ -112,6 +118,10 @@ class _OpFormScreenState extends State<OpFormScreen> {
   void _pay() {
     if (_nameCtrl.text.isEmpty) {
       _showSnack('Please enter patient name');
+      return;
+    }
+    if (_selectedTimeSlot.isEmpty) {
+      _showSnack('Please select an appointment time slot');
       return;
     }
     setState(() => _isSubmitting = true);
@@ -209,6 +219,59 @@ class _OpFormScreenState extends State<OpFormScreen> {
                       )),
                   ],
                 ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Time Slot Selection
+            FadeInUp(
+              delay: const Duration(milliseconds: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Select Time Slot',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    )),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    height: 42,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _timeSlots.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 10),
+                      itemBuilder: (_, i) {
+                        final slot = _timeSlots[i];
+                        final isActive = slot == _selectedTimeSlot;
+                        return GestureDetector(
+                          onTap: () => setState(() => _selectedTimeSlot = slot),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: isActive ? AppColors.blue : Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isActive ? AppColors.blue : const Color(0xFFE3EAF2),
+                                width: isActive ? 1.5 : 1,
+                              ),
+                            ),
+                            child: Center(
+                              child: Text(slot,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
+                                  color: isActive ? Colors.white : AppColors.textPrimary,
+                                )),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 16),

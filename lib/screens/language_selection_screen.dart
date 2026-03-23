@@ -1,0 +1,209 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../core/localization/app_localizations.dart';
+import '../bloc/locale/locale_cubit.dart';
+
+class LanguageSelectionScreen extends StatefulWidget {
+  final bool isFirstTime;
+
+  const LanguageSelectionScreen({Key? key, this.isFirstTime = false}) : super(key: key);
+
+  @override
+  _LanguageSelectionScreenState createState() => _LanguageSelectionScreenState();
+}
+
+class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
+  final List<Map<String, dynamic>> _languages = [
+    {'code': 'en', 'name': 'English', 'native': 'English', 'flag': '🇺🇸'},
+    {'code': 'hi', 'name': 'Hindi', 'native': 'हिन्दी', 'flag': '🇮🇳'},
+    {'code': 'te', 'name': 'Telugu', 'native': 'తెలుగు', 'flag': '🇮🇳'},
+    {'code': 'ta', 'name': 'Tamil', 'native': 'தமிழ்', 'flag': '🇮🇳'},
+    {'code': 'kn', 'name': 'Kannada', 'native': 'ಕನ್ನಡ', 'flag': '🇮🇳'},
+    {'code': 'ml', 'name': 'Malayalam', 'native': 'മലയാളം', 'flag': '🇮🇳'},
+    {'code': 'mr', 'name': 'Marathi', 'native': 'मराठी', 'flag': '🇮🇳'},
+    {'code': 'bn', 'name': 'Bengali', 'native': 'বাংলা', 'flag': '🇮🇳'},
+  ];
+
+  String _selectedLanguage = 'en';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF1A5F7A),
+              Color(0xFF159957),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              if (widget.isFirstTime)
+                Padding(
+                  padding: EdgeInsets.only(top: 50),
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        'assets/images/ayurvanta_logo.png',
+                        height: 100,
+                        color: Colors.white,
+                        errorBuilder: (context, error, stackTrace) => Icon(Icons.health_and_safety, size: 100, color: Colors.white),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        'AyurVanta',
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        'Your Health Companion',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              Expanded(
+                child: Container(
+                  margin: EdgeInsets.all(20),
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.isFirstTime ? 'Choose Your Language' : 'Select Language',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1A5F7A),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        widget.isFirstTime
+                            ? 'Select your preferred language for the app'
+                            : 'Change your app language',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      SizedBox(height: 30),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: _languages.length,
+                          itemBuilder: (context, index) {
+                            final lang = _languages[index];
+                            final isSelected = _selectedLanguage == lang['code'];
+                            return Container(
+                              margin: EdgeInsets.only(bottom: 12),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: isSelected ? Color(0xFF1A5F7A) : Colors.grey[300]!,
+                                  width: isSelected ? 2 : 1,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: RadioListTile<String>(
+                                value: lang['code'],
+                                groupValue: _selectedLanguage,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedLanguage = value!;
+                                  });
+                                },
+                                title: Row(
+                                  children: [
+                                    Text(
+                                      lang['flag'],
+                                      style: TextStyle(fontSize: 24),
+                                    ),
+                                    SizedBox(width: 12),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          lang['name'],
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          lang['native'],
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                activeColor: Color(0xFF1A5F7A),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () async {
+                          final locale = Locale(_selectedLanguage);
+                          await AppLocalizations.saveLocale(locale);
+                          context.read<LocaleCubit>().setLocale(locale);
+                          
+                          if (widget.isFirstTime) {
+                            Navigator.pushReplacementNamed(context, '/login');
+                          } else {
+                            Navigator.pop(context);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF1A5F7A),
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          minimumSize: Size(double.infinity, 50),
+                        ),
+                        child: Text(
+                          widget.isFirstTime ? 'Continue' : 'Apply',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

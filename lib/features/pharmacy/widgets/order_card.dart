@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../models/medicine_model.dart';
+import '../screens/order_tracking_screen.dart';
 
 class OrderCard extends StatelessWidget {
   final OrderModel order;
@@ -35,94 +36,104 @@ class OrderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final stepsDone = order.status.index + 1;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-            color: const Color(0xFFE3EAF2), width: 0.5),
-      ),
-      child: Column(
-        children: [
-          // Order header
-          Row(
-            children: [
-              Container(
-                width: 44, height: 44,
-                decoration: BoxDecoration(
-                  color: AppColors.blueLight,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.inventory_2_outlined,
-                    color: AppColors.blue, size: 22),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${order.medicines.length} Medicine${order.medicines.length > 1 ? 's' : ''} · ₹${order.totalAmount}',
-                      style: const TextStyle(fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary),
-                    ),
-                    const SizedBox(height: 2),
-                    Text('Order #${order.orderNumber} · ${order.date}',
-                      style: const TextStyle(fontSize: 11,
-                          color: AppColors.textSecondary)),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: _statusBg,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(_statusText,
-                  style: TextStyle(fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      color: _statusColor)),
-              ),
-            ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => OrderTrackingScreen(order: order),
           ),
-          const SizedBox(height: 12),
-          const Divider(color: Color(0xFFF0F4F8), height: 1),
-          const SizedBox(height: 12),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+              color: const Color(0xFFE3EAF2), width: 0.5),
+        ),
+        child: Column(
+          children: [
+            // Order header
+            Row(
+              children: [
+                Container(
+                  width: 44, height: 44,
+                  decoration: BoxDecoration(
+                    color: AppColors.blueLight,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.inventory_2_outlined,
+                      color: AppColors.blue, size: 22),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${order.medicines.length} Medicine${order.medicines.length > 1 ? 's' : ''} · ₹${order.totalAmount}',
+                        style: const TextStyle(fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary),
+                      ),
+                      const SizedBox(height: 2),
+                      Text('Order #${order.orderNumber} · ${order.date}',
+                        style: const TextStyle(fontSize: 11,
+                            color: AppColors.textSecondary)),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: _statusBg,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(_statusText,
+                    style: TextStyle(fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: _statusColor)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Divider(color: Color(0xFFF0F4F8), height: 1),
+            const SizedBox(height: 12),
 
-          // Tracking steps
-          Row(
-            children: [
-              _TrackStep(
-                  label: 'Placed',
-                  icon: Icons.check_circle_rounded,
-                  isDone: stepsDone >= 1,
-                  isActive: stepsDone == 1),
-              _TrackLine(isDone: stepsDone >= 2),
-              _TrackStep(
-                  label: 'Packed',
-                  icon: Icons.inventory_rounded,
-                  isDone: stepsDone >= 2,
-                  isActive: stepsDone == 2),
-              _TrackLine(isDone: stepsDone >= 3),
-              _TrackStep(
-                  label: 'Shipped',
-                  icon: Icons.local_shipping_rounded,
-                  isDone: stepsDone >= 3,
-                  isActive: stepsDone == 3),
-              _TrackLine(isDone: stepsDone >= 4),
-              _TrackStep(
-                  label: 'Delivered',
-                  icon: Icons.home_rounded,
-                  isDone: stepsDone >= 4,
-                  isActive: stepsDone == 4),
-            ],
-          ),
-        ],
+            // Tracking steps
+            Row(
+              children: [
+                _TrackStep(
+                    label: 'Placed',
+                    icon: Icons.check_circle_rounded,
+                    isDone: stepsDone >= 1,
+                    isActive: stepsDone == 1),
+                _TrackLine(isDone: stepsDone >= 2),
+                _TrackStep(
+                    label: 'Packed',
+                    icon: Icons.inventory_rounded,
+                    isDone: stepsDone >= 2,
+                    isActive: stepsDone == 2),
+                _TrackLine(isDone: stepsDone >= 3),
+                _TrackStep(
+                    label: 'Shipped',
+                    icon: Icons.local_shipping_rounded,
+                    isDone: stepsDone >= 3,
+                    isActive: stepsDone == 3),
+                _TrackLine(isDone: stepsDone >= 4),
+                _TrackStep(
+                    label: 'Delivered',
+                    icon: Icons.home_rounded,
+                    isDone: stepsDone >= 4,
+                    isActive: stepsDone == 4),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

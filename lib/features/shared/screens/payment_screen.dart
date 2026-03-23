@@ -149,7 +149,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       ? const Icon(Icons.check_rounded,
                           color: Colors.white, size: 12)
                       : null),
-            ]))),
+            ])))),
         const SizedBox(height: 16),
         Container(padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(

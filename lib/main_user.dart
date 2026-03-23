@@ -29,15 +29,20 @@ class AyurVantaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'AyurVanta',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        scaffoldBackgroundColor: const Color(0xFF0B1A2C),
-        fontFamily: 'SF Pro Display',
-      ),
-      home: const SplashScreen(),
+    return Consumer<AppTranslations>(
+      builder: (context, translations, child) {
+        return MaterialApp(
+          title: 'AyurVanta',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            useMaterial3: true,
+            scaffoldBackgroundColor: const Color(0xFF0B1A2C),
+            fontFamily: 'SF Pro Display',
+          ),
+          home: const SplashScreen(),
+        );
+      },
     );
   }
 }
+

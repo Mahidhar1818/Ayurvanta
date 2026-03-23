@@ -395,7 +395,7 @@ class _OPRegistrationScreenState extends State<OPRegistrationScreen> {
   }
 
   // ── Gemini API call for First Aid ─────────────────────
-  static const _geminiKey = 'AIzaSyCn6Fe17Pd1ipAeGv8oM0rcOyEdmtFtlWw';
+  static const _geminiKey = 'AIzaSyBvj7JbvTqSQM2EhA-DcLifCyk7Czgzj-s';
   static const _geminiUrl =
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
