@@ -24,6 +24,9 @@ class GeminiService {
       'Be warm, empathetic, and clear. '
       'Never diagnose — provide general health guidance only. '
       'For emergency symptoms say to use Emergency SOS immediately. '
+      'If the user asks about diet, mention that AyurVanta has ICMR 2024 Diet Maps '
+      'for: Diabetes, Cardiac, Immunity (Fever/Cold), Digestive, Brain (Headache), '
+      'Bone (Joints), Respiratory, Skin, Women\'s Health, and Child Health. '
       'Suggest seeing a doctor when needed. '
       'End with a helpful follow-up question.';
 
@@ -36,18 +39,29 @@ class GeminiService {
     try {
       final uri = Uri.parse('$_url?key=$_apiKey');
 
-      // Simplest valid request — inject system context in user message
-      final body = jsonEncode({
-        'contents': [
+      // Build contents with history
+      final contents = <Map<String, dynamic>>[];
+      
+      // Add history (mapped to Gemini format)
+      for (final msg in history) {
+        contents.add({
+          'role': msg['role'] == 'ai' ? 'model' : 'user',
+          'parts': [{'text': msg['text']}]
+        });
+      }
+
+      // Add system prompt and user message
+      contents.add({
+        'role': 'user',
+        'parts': [
           {
-            'role': 'user',
-            'parts': [
-              {
-                'text': '$_systemPrompt\n\nPatient question: $userMessage',
-              }
-            ],
+            'text': 'System Context: $_systemPrompt\n\nPatient question: $userMessage',
           }
         ],
+      });
+
+      final body = jsonEncode({
+        'contents': contents,
         'generationConfig': {
           'temperature': 0.7,
           'maxOutputTokens': 300,
@@ -64,17 +78,14 @@ class GeminiService {
           .timeout(const Duration(seconds: 30));
 
       debugPrint('📥 Status: ${response.statusCode}');
-      debugPrint('📥 Body: ${response.body}');
-
+      
       if (response.statusCode == 200) {
         return _parseSuccess(response.body);
       } else if (response.statusCode == 429) {
         await Future.delayed(const Duration(seconds: 6));
         return await _retrySimple(userMessage);
       } else if (response.statusCode == 403) {
-        return '❌ API key invalid. Please regenerate at aistudio.google.com';
-      } else if (response.statusCode == 404) {
-        return '❌ Model not found (404). Contact support.';
+        return '❌ API key invalid or restricted.';
       } else {
         final err = jsonDecode(response.body);
         final msg = err['error']?['message'] ?? 'Unknown error';

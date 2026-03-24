@@ -332,12 +332,21 @@ class _NutritionTab extends StatelessWidget {
           const SizedBox(height: 20),
 
           // Age-specific plans
-          const Text('Age-Based Diet Plans',
+          const Text('Age & Group-Based Diet Plans',
               style: TextStyle(fontSize: 15,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary)),
           const SizedBox(height: 12),
           ..._agePlans.map((p) => _AgePlanCard(plan: p)),
+          const SizedBox(height: 20),
+
+          // Profession-specific plans
+          const Text('Profession-Specific Diet Plans',
+              style: TextStyle(fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary)),
+          const SizedBox(height: 12),
+          ..._professionPlans.map((p) => _AgePlanCard(plan: p)),
           const SizedBox(height: 20),
 
           // Condition-specific
@@ -777,6 +786,58 @@ const List<Map<String, dynamic>> _agePlans = [
       'Adequate hydration (thirst sensation reduced)',
     ],
     'color': Color(0xFFBA7517),
+  },
+];
+
+// Profession-based plans
+const List<Map<String, dynamic>> _professionPlans = [
+  {
+    'group': 'Sports Men & Athletes',
+    'emoji': '🏃‍♂️',
+    'calories': '2,500–3,500+ kcal/day',
+    'key_points': [
+      'High complex carbs (brown rice, sweet potato) for energy',
+      'Lean protein (chicken, fish, eggs) for muscle recovery',
+      'Hydration with electrolytes during workouts',
+      'Pre-workout and post-workout meals are critical',
+    ],
+    'color': Color(0xFFD85A30),
+  },
+  {
+    'group': 'Uniform Service Personnel',
+    'emoji': '👮‍♂️',
+    'calories': '2,200–2,800 kcal/day',
+    'key_points': [
+      'Balanced meals to sustain long shifts on feet',
+      'High protein and moderate carbs',
+      'Avoid heavy meals before active duties to prevent sluggishness',
+      'Frequent hydration is essential while outdoors',
+    ],
+    'color': Color(0xFF185FA5),
+  },
+  {
+    'group': 'Police',
+    'emoji': '🚨',
+    'calories': '2,400–3,000 kcal/day',
+    'key_points': [
+      'Focus on stamina and quick energy foods',
+      'Include nuts, seeds, and fruits for quick snacking on duty',
+      'Adequate protein to maintain physical strength',
+      'Strong focus on cardiovascular health (healthy fats)',
+    ],
+    'color': Color(0xFF0F6E56),
+  },
+  {
+    'group': 'Physical Trainers',
+    'emoji': '🏋️‍♂️',
+    'calories': '2,800–3,500 kcal/day',
+    'key_points': [
+      'Protein intake of 1.6-2.0g per kg of body weight',
+      'Frequent meals (every 3 hours) to maintain metabolic rate',
+      'Healthy fats (avocado, olive oil, nuts) for joints',
+      'High micronutrient focus for peak performance',
+    ],
+    'color': Color(0xFFE8243A),
   },
 ];
 

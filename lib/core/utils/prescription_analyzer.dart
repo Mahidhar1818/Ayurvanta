@@ -50,7 +50,7 @@ class PrescriptionAnalyzer {
     
     return PrescriptionAnalysis(
       medicines: matches,
-      frequency: frequencies.isNotEmpty ? frequencies.first : 'Not specified',
+      frequency: frequencies.isNotEmpty ? (frequencies.first ?? 'Not specified') : 'Not specified',
       duration: duration ?? 'Not specified',
       hasWarnings: matches.any((m) => m.category == 'steroids' || m.category == 'antibiotics'),
     );

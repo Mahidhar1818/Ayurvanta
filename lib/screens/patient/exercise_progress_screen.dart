@@ -110,7 +110,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen> {
             Divider(),
             SizedBox(height: 8),
             Text(
-              'Doctor's Notes:',
+              'Doctor\'s Notes:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 4),
@@ -140,7 +140,7 @@ class _ExerciseProgressScreenState extends State<ExerciseProgressScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Today's Session',
+                'Today\'s Session',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

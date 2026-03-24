@@ -3,8 +3,11 @@ import 'package:animate_do/animate_do.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/translations/app_translations.dart';
 import '../../../core/services/auth_preference_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'module_selector_screen.dart';
 import '../../home/screens/home_screen.dart';
+
+import 'location_permission_screen.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
   const LanguageSelectionScreen({super.key});
@@ -32,17 +35,30 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   Future<void> _continue() async {
     setState(() => _isLoading = true);
     await AppTranslations.instance.setLanguage(_selected);
+    
+    final prefs = await SharedPreferences.getInstance();
+    final locSet = prefs.containsKey('location_granted');
+    final loggedIn = await AuthPreferenceService.isLoggedIn();
+    
     if (!mounted) return;
     setState(() => _isLoading = false);
-    final loggedIn = await AuthPreferenceService.isLoggedIn();
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) =>
-            loggedIn ? const HomeScreen() : const ModuleSelectorScreen(),
-      ),
-    );
+    
+    if (!locSet) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const LocationPermissionScreen(),
+        ),
+      );
+    } else {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (_) => loggedIn ? const HomeScreen() : const ModuleSelectorScreen(),
+        ),
+        (_) => false,
+      );
+    }
   }
 
   @override

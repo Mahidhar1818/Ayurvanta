@@ -7,7 +7,11 @@ extension StringExtension on String {
 
 extension TrExtension on BuildContext {
   String tr(String key) {
-    return AppTranslations.instance.tr(key);
+    try {
+      return AppTranslations.instance.tr(key);
+    } catch (e) {
+      return key;
+    }
   }
 
   AppTranslations get translations => AppTranslations.instance;

@@ -5,6 +5,7 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:telephony/telephony.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:timezone/timezone.dart' as tz;
 import '../core/services/api_service.dart';
 
 class NotificationService {
@@ -119,16 +120,16 @@ class NotificationService {
       exerciseId,
       'Exercise Reminder',
       'Time to do: $exerciseName',
-      time,
+      tz.TZDateTime.from(time, tz.local),
       details,
-      androidAllowWhileIdle: true,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation: 
           UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time,
     );
     
     // Schedule alarm for voice call
-    await AndroidAlarmManager.oneShot(
+    await AndroidAlarmManager.oneShotAt(
       time,
       exerciseId,
       () => _makeVoiceCall(patientPhone),

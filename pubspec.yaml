@@ -32,7 +32,7 @@ dependencies:
   url_launcher: ^6.3.2
   flutter_local_notifications: ^18.0.1
   audioplayers: ^6.0.0
-  timezone: ^0.9.4
+  timezone: ^0.10.1
   sensors_plus: ^4.0.2
   flutter_blue_plus: ^1.31.7
   flutter_bloc: ^9.1.1
@@ -42,6 +42,7 @@ dependencies:
   telephony: ^0.2.0
   google_maps_flutter: ^2.16.0
   workmanager: ^0.9.0+3
+  dio: ^5.9.2
 
 dev_dependencies:
   flutter_test:

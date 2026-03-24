@@ -1099,7 +1099,7 @@ class _JobCard extends StatelessWidget {
               Padding(padding: EdgeInsets.fromLTRB(20, 0, 20,
                   MediaQuery.of(context).padding.bottom + 16),
                 child: Row(children: [
-                  GestureDetector(onSave,
+                  GestureDetector(onTap: onSave,
                     child: Container(width: 50, height: 50,
                       decoration: BoxDecoration(border: Border.all(
                           color: const Color(0xFFE3EAF2)),

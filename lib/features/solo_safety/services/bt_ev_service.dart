@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'sensor_sos_service.dart';
 
 class BtEvService {
@@ -29,6 +30,21 @@ class BtEvService {
   Future<void> startScan() async {
     if (_isScanning) return;
     _isScanning = true;
+    status.value = 'Requesting permissions...';
+
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.bluetoothScan,
+      Permission.bluetoothConnect,
+      Permission.location,
+    ].request();
+
+    if (statuses[Permission.bluetoothScan] != PermissionStatus.granted &&
+        statuses[Permission.bluetoothConnect] != PermissionStatus.granted) {
+      // It might be already granted or the OS handles it differently (like iOS)
+      // We will still proceed, but usually you'd show a dialog.
+      // Let's just aggressively check for Android 12+ where it's tightly enforced.
+    }
+
     status.value = 'Scanning...';
 
     final btState = await FlutterBluePlus.adapterState.first;

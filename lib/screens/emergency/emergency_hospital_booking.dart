@@ -154,22 +154,22 @@ class _EmergencyHospitalBookingScreenState
           VoiceField(
             label: context.tr('symptoms'),
             controller: _symptomsController,
-            prompt: context.tr('voice_prompt_symptoms', fallback: 'Please describe the symptoms you are experiencing'),
+            prompt: context.tr('voice_prompt_symptoms') ?? 'Please describe the symptoms you are experiencing',
           ),
           VoiceField(
             label: context.tr('patient_condition'),
             controller: _patientConditionController,
-            prompt: context.tr('voice_prompt_condition', fallback: 'Describe the current condition of the patient'),
+            prompt: context.tr('voice_prompt_condition') ?? 'Describe the current condition of the patient',
           ),
           VoiceField(
             label: context.tr('location'),
             controller: _locationController,
-            prompt: context.tr('voice_prompt_location', fallback: 'Please tell your current location'),
+            prompt: context.tr('voice_prompt_location') ?? 'Please tell your current location',
           ),
           VoiceField(
             label: context.tr('additional_notes'),
             controller: _emergencyNotesController,
-            prompt: context.tr('voice_prompt_notes', fallback: 'Any additional information for the hospital'),
+            prompt: context.tr('voice_prompt_notes') ?? 'Any additional information for the hospital',
           ),
         ],
         onComplete: () {
@@ -183,7 +183,7 @@ class _EmergencyHospitalBookingScreenState
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(context.tr('confirm_emergency_booking', fallback: 'Confirm Emergency Booking')),
+        title: Text(context.tr('confirm_emergency_booking') ?? 'Confirm Emergency Booking'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,7 +205,7 @@ class _EmergencyHospitalBookingScreenState
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text(context.tr('book_emergency_op', fallback: 'Book Emergency OP')),
+            child: Text(context.tr('book_emergency_op') ?? 'Book Emergency OP'),
           ),
         ],
       ),
@@ -316,7 +316,7 @@ class _EmergencyHospitalBookingScreenState
       padding: const EdgeInsets.all(16),
       child: TextField(
         decoration: InputDecoration(
-          hintText: context.tr('search_hospital_hint', fallback: 'Search hospitals...'),
+          hintText: context.tr('search_hospital_hint') ?? 'Search hospitals...',
           prefixIcon: const Icon(Icons.search),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -541,7 +541,7 @@ class _EmergencyHospitalBookingScreenState
             TextField(
               controller: _symptomsController,
               decoration: InputDecoration(
-                hintText: context.tr('symptoms_hint', fallback: 'Symptoms'),
+                hintText: context.tr('symptoms_hint') ?? 'Symptoms',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -552,7 +552,7 @@ class _EmergencyHospitalBookingScreenState
             TextField(
               controller: _patientConditionController,
               decoration: InputDecoration(
-                hintText: context.tr('condition_hint', fallback: 'Patient condition'),
+                hintText: context.tr('condition_hint') ?? 'Patient condition',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -634,7 +634,7 @@ class _EmergencyHospitalBookingScreenState
                          _bookEmergencyOP(hospital);
                       },
                       icon: const Icon(Icons.emergency),
-                      label: Text(context.tr('book_emergency_op', fallback: 'Book Emergency')),
+                      label: Text(context.tr('book_emergency_op') ?? 'Book Emergency'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         padding: const EdgeInsets.symmetric(vertical: 12),

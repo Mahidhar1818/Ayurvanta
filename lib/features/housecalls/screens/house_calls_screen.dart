@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/translations/app_translations.dart';
+import '../../body_map/screens/body_map_screen.dart';
 
 // ═══════════════════════════════════════════════════════════════
 //  MODELS
@@ -25,6 +26,7 @@ class HCDoctor {
   final bool availableToday;
   final String nextSlot;
   final List<String> conditions;
+  final String location;
 
   const HCDoctor({
     required this.id,
@@ -41,6 +43,7 @@ class HCDoctor {
     required this.availableToday,
     required this.nextSlot,
     required this.conditions,
+    required this.location,
   });
 }
 
@@ -152,19 +155,19 @@ const Map<String, Map<String, String>> _specTranslations = {
 };
 
 final List<HCDoctor> _allDoctors = [
-  HCDoctor(id: 'd1', name: 'Dr. Priya Sharma', specialty: 'general', qualification: 'MBBS, MD (General Medicine)', hospital: 'Apollo Hospitals', rating: 4.9, reviews: 312, experience: 14, visitFee: 599, emoji: '👩⚕️', languages: ['English', 'Hindi', 'Telugu'], availableToday: true, nextSlot: 'Today 11:00 AM', conditions: ['Fever', 'Cold', 'BP Check', 'General Checkup', 'Fatigue']),
-  HCDoctor(id: 'd2', name: 'Dr. Ravi Kumar', specialty: 'cardio', qualification: 'MBBS, MD, DM (Cardiology)', hospital: 'Apollo Hospitals Hyderabad', rating: 4.8, reviews: 428, experience: 18, visitFee: 1299, emoji: '🧑⚕️', languages: ['English', 'Telugu', 'Hindi'], availableToday: true, nextSlot: 'Today 3:00 PM', conditions: ['Chest Pain', 'BP', 'Heart Palpitations', 'Post-surgery follow-up']),
-  HCDoctor(id: 'd3', name: 'Dr. Anitha Reddy', specialty: 'diabetes', qualification: 'MBBS, MD, Fellowship (Diabetology)', hospital: 'Care Hospitals', rating: 4.7, reviews: 195, experience: 11, visitFee: 899, emoji: '👩⚕️', languages: ['Telugu', 'English'], availableToday: true, nextSlot: 'Today 2:00 PM', conditions: ['Diabetes Management', 'HbA1c Review', 'Insulin Adjustment', 'Diet Counseling']),
-  HCDoctor(id: 'd4', name: 'Dr. Suresh Babu', specialty: 'pediatric', qualification: 'MBBS, DCH, MD (Pediatrics)', hospital: 'Rainbow Hospitals', rating: 4.9, reviews: 521, experience: 16, visitFee: 799, emoji: '🧑⚕️', languages: ['Telugu', 'English', 'Hindi'], availableToday: false, nextSlot: 'Tomorrow 10:00 AM', conditions: ['Child Fever', 'Vaccinations', 'Growth Assessment', 'Newborn Care']),
-  HCDoctor(id: 'd5', name: 'Dr. Kavitha Menon', specialty: 'ortho', qualification: 'MBBS, MS (Orthopaedics)', hospital: 'Yashoda Hospitals', rating: 4.6, reviews: 178, experience: 12, visitFee: 999, emoji: '👩⚕️', languages: ['English', 'Malayalam', 'Hindi'], availableToday: true, nextSlot: 'Today 5:00 PM', conditions: ['Joint Pain', 'Fracture Review', 'Physiotherapy Advice', 'Spine Issues']),
-  HCDoctor(id: 'd6', name: 'Dr. Venkat Rao', specialty: 'neuro', qualification: 'MBBS, MD, DM (Neurology)', hospital: 'NIMS Hyderabad', rating: 4.8, reviews: 264, experience: 20, visitFee: 1499, emoji: '🧑⚕️', languages: ['Telugu', 'English'], availableToday: false, nextSlot: 'Tomorrow 9:00 AM', conditions: ['Headache', 'Migraine', 'Paralysis Follow-up', 'Memory Issues', 'Epilepsy']),
-  HCDoctor(id: 'd7', name: 'Dr. Sneha Patel', specialty: 'derma', qualification: 'MBBS, MD (Dermatology)', hospital: 'Kamineni Hospitals', rating: 4.7, reviews: 303, experience: 9, visitFee: 799, emoji: '👩⚕️', languages: ['English', 'Hindi', 'Gujarati'], availableToday: true, nextSlot: 'Today 1:00 PM', conditions: ['Skin Rash', 'Acne', 'Eczema', 'Hair Loss', 'Psoriasis']),
-  HCDoctor(id: 'd8', name: 'Dr. Lakshmi Prasad', specialty: 'gynec', qualification: 'MBBS, MS (OBG)', hospital: 'Fernandez Hospital', rating: 4.9, reviews: 417, experience: 15, visitFee: 999, emoji: '👩⚕️', languages: ['Telugu', 'English', 'Hindi'], availableToday: true, nextSlot: 'Today 4:00 PM', conditions: ['Pregnancy Checkup', 'PCOS', 'Menstrual Issues', 'Post-delivery Care']),
-  HCDoctor(id: 'd9', name: 'Dr. Arun Krishnan', specialty: 'ent', qualification: 'MBBS, MS (ENT)', hospital: 'Star Hospitals', rating: 4.6, reviews: 142, experience: 10, visitFee: 699, emoji: '🧑⚕️', languages: ['English', 'Tamil', 'Telugu'], availableToday: true, nextSlot: 'Today 12:00 PM', conditions: ['Ear Pain', 'Sinus', 'Tonsillitis', 'Hearing Issues', 'Vertigo']),
-  HCDoctor(id: 'd10', name: 'Dr. Meena Iyer', specialty: 'physio', qualification: 'BPT, MPT (Ortho)', hospital: 'Independent Practitioner', rating: 4.8, reviews: 229, experience: 8, visitFee: 599, emoji: '👩⚕️', languages: ['Tamil', 'English', 'Hindi'], availableToday: true, nextSlot: 'Today 6:00 PM', conditions: ['Back Pain', 'Sports Injury', 'Stroke Rehab', 'Post-Surgery Physio']),
-  HCDoctor(id: 'd11', name: 'Dr. Rajesh Gupta', specialty: 'geriatric', qualification: 'MBBS, MD, Fellowship (Geriatrics)', hospital: 'Medicover Hospitals', rating: 4.7, reviews: 156, experience: 22, visitFee: 1199, emoji: '🧑⚕️', languages: ['Hindi', 'English'], availableToday: false, nextSlot: 'Tomorrow 11:00 AM', conditions: ['Elderly Care', 'Dementia', 'Fall Prevention', 'Palliative Care']),
-  HCDoctor(id: 'd12', name: 'Dr. Sujatha Nair', specialty: 'pulmo', qualification: 'MBBS, MD (Pulmonology)', hospital: 'Citizen Hospitals', rating: 4.7, reviews: 198, experience: 13, visitFee: 999, emoji: '👩⚕️', languages: ['Malayalam', 'English', 'Hindi'], availableToday: true, nextSlot: 'Today 10:00 AM', conditions: ['Asthma', 'COPD', 'Breathlessness', 'Sleep Apnea', 'Post-COVID Care']),
-  HCDoctor(id: 'd13', name: 'Dr. Prasad Kulkarni', specialty: 'psych', qualification: 'MBBS, MD (Psychiatry)', hospital: 'NIMHANS Affiliated', rating: 4.8, reviews: 287, experience: 17, visitFee: 1299, emoji: '🧑⚕️', languages: ['Marathi', 'Hindi', 'English'], availableToday: false, nextSlot: 'Tomorrow 2:00 PM', conditions: ['Anxiety', 'Depression', 'Insomnia', 'Stress Management', 'OCD']),
+  HCDoctor(id: 'd1', name: 'Dr. Priya Sharma', specialty: 'general', qualification: 'MBBS, MD (General Medicine)', hospital: 'Apollo Hospitals', rating: 4.9, reviews: 312, experience: 14, visitFee: 599, emoji: '👩⚕️', languages: ['English', 'Hindi', 'Telugu'], availableToday: true, nextSlot: 'Today 11:00 AM', conditions: ['Fever', 'Cold', 'BP Check', 'General Checkup', 'Fatigue'], location: 'Delhi'),
+  HCDoctor(id: 'd2', name: 'Dr. Ravi Kumar', specialty: 'cardio', qualification: 'MBBS, MD, DM (Cardiology)', hospital: 'Apollo Hospitals Hyderabad', rating: 4.8, reviews: 428, experience: 18, visitFee: 1299, emoji: '🧑⚕️', languages: ['English', 'Telugu', 'Hindi'], availableToday: true, nextSlot: 'Today 3:00 PM', conditions: ['Chest Pain', 'BP', 'Heart Palpitations', 'Post-surgery follow-up'], location: 'Hyderabad'),
+  HCDoctor(id: 'd3', name: 'Dr. Anitha Reddy', specialty: 'diabetes', qualification: 'MBBS, MD, Fellowship (Diabetology)', hospital: 'Care Hospitals', rating: 4.7, reviews: 195, experience: 11, visitFee: 899, emoji: '👩⚕️', languages: ['Telugu', 'English'], availableToday: true, nextSlot: 'Today 2:00 PM', conditions: ['Diabetes Management', 'HbA1c Review', 'Insulin Adjustment', 'Diet Counseling'], location: 'Hyderabad'),
+  HCDoctor(id: 'd4', name: 'Dr. Suresh Babu', specialty: 'pediatric', qualification: 'MBBS, DCH, MD (Pediatrics)', hospital: 'Rainbow Hospitals', rating: 4.9, reviews: 521, experience: 16, visitFee: 799, emoji: '🧑⚕️', languages: ['Telugu', 'English', 'Hindi'], availableToday: false, nextSlot: 'Tomorrow 10:00 AM', conditions: ['Child Fever', 'Vaccinations', 'Growth Assessment', 'Newborn Care'], location: 'Bangalore'),
+  HCDoctor(id: 'd5', name: 'Dr. Kavitha Menon', specialty: 'ortho', qualification: 'MBBS, MS (Orthopaedics)', hospital: 'Yashoda Hospitals', rating: 4.6, reviews: 178, experience: 12, visitFee: 999, emoji: '👩⚕️', languages: ['English', 'Malayalam', 'Hindi'], availableToday: true, nextSlot: 'Today 5:00 PM', conditions: ['Joint Pain', 'Fracture Review', 'Physiotherapy Advice', 'Spine Issues'], location: 'Hyderabad'),
+  HCDoctor(id: 'd6', name: 'Dr. Venkat Rao', specialty: 'neuro', qualification: 'MBBS, MD, DM (Neurology)', hospital: 'NIMS Hyderabad', rating: 4.8, reviews: 264, experience: 20, visitFee: 1499, emoji: '🧑⚕️', languages: ['Telugu', 'English'], availableToday: false, nextSlot: 'Tomorrow 9:00 AM', conditions: ['Headache', 'Migraine', 'Paralysis Follow-up', 'Memory Issues', 'Epilepsy'], location: 'Hyderabad'),
+  HCDoctor(id: 'd7', name: 'Dr. Sneha Patel', specialty: 'derma', qualification: 'MBBS, MD (Dermatology)', hospital: 'Kamineni Hospitals', rating: 4.7, reviews: 303, experience: 9, visitFee: 799, emoji: '👩⚕️', languages: ['English', 'Hindi', 'Gujarati'], availableToday: true, nextSlot: 'Today 1:00 PM', conditions: ['Skin Rash', 'Acne', 'Eczema', 'Hair Loss', 'Psoriasis'], location: 'Mumbai'),
+  HCDoctor(id: 'd8', name: 'Dr. Lakshmi Prasad', specialty: 'gynec', qualification: 'MBBS, MS (OBG)', hospital: 'Fernandez Hospital', rating: 4.9, reviews: 417, experience: 15, visitFee: 999, emoji: '👩⚕️', languages: ['Telugu', 'English', 'Hindi'], availableToday: true, nextSlot: 'Today 4:00 PM', conditions: ['Pregnancy Checkup', 'PCOS', 'Menstrual Issues', 'Post-delivery Care'], location: 'Hyderabad'),
+  HCDoctor(id: 'd9', name: 'Dr. Arun Krishnan', specialty: 'ent', qualification: 'MBBS, MS (ENT)', hospital: 'Star Hospitals', rating: 4.6, reviews: 142, experience: 10, visitFee: 699, emoji: '🧑⚕️', languages: ['English', 'Tamil', 'Telugu'], availableToday: true, nextSlot: 'Today 12:00 PM', conditions: ['Ear Pain', 'Sinus', 'Tonsillitis', 'Hearing Issues', 'Vertigo'], location: 'Chennai'),
+  HCDoctor(id: 'd10', name: 'Dr. Meena Iyer', specialty: 'physio', qualification: 'BPT, MPT (Ortho)', hospital: 'Independent Practitioner', rating: 4.8, reviews: 229, experience: 8, visitFee: 599, emoji: '👩⚕️', languages: ['Tamil', 'English', 'Hindi'], availableToday: true, nextSlot: 'Today 6:00 PM', conditions: ['Back Pain', 'Sports Injury', 'Stroke Rehab', 'Post-Surgery Physio'], location: 'Chennai'),
+  HCDoctor(id: 'd11', name: 'Dr. Rajesh Gupta', specialty: 'geriatric', qualification: 'MBBS, MD, Fellowship (Geriatrics)', hospital: 'Medicover Hospitals', rating: 4.7, reviews: 156, experience: 22, visitFee: 1199, emoji: '🧑⚕️', languages: ['Hindi', 'English'], availableToday: false, nextSlot: 'Tomorrow 11:00 AM', conditions: ['Elderly Care', 'Dementia', 'Fall Prevention', 'Palliative Care'], location: 'Pune'),
+  HCDoctor(id: 'd12', name: 'Dr. Sujatha Nair', specialty: 'pulmo', qualification: 'MBBS, MD (Pulmonology)', hospital: 'Citizen Hospitals', rating: 4.7, reviews: 198, experience: 13, visitFee: 999, emoji: '👩⚕️', languages: ['Malayalam', 'English', 'Hindi'], availableToday: true, nextSlot: 'Today 10:00 AM', conditions: ['Asthma', 'COPD', 'Breathlessness', 'Sleep Apnea', 'Post-COVID Care'], location: 'Hyderabad'),
+  HCDoctor(id: 'd13', name: 'Dr. Prasad Kulkarni', specialty: 'psych', qualification: 'MBBS, MD (Psychiatry)', hospital: 'NIMHANS Affiliated', rating: 4.8, reviews: 287, experience: 17, visitFee: 1299, emoji: '🧑⚕️', languages: ['Marathi', 'Hindi', 'English'], availableToday: false, nextSlot: 'Tomorrow 2:00 PM', conditions: ['Anxiety', 'Depression', 'Insomnia', 'Stress Management', 'OCD'], location: 'Mumbai'),
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -183,6 +186,8 @@ class _HouseCallsScreenState extends State<HouseCallsScreen>
   late TabController _tabController;
   String _selectedSpec = 'all';
   String _searchQuery = '';
+  String _selectedLocation = 'Hyderabad';
+  String? _tappedBodyPart;
   final _searchCtrl = TextEditingController();
   List<HCBooking> _bookings = [];
   String _lang = 'en';
@@ -240,7 +245,8 @@ class _HouseCallsScreenState extends State<HouseCallsScreen>
           _specLabel(d.specialty).toLowerCase().contains(q) ||
           d.conditions.any((c) => c.toLowerCase().contains(q)) ||
           d.hospital.toLowerCase().contains(q);
-      return matchSpec && matchSearch;
+      final matchLoc = _selectedLocation == 'Anywhere' || _selectedLocation == 'Current Location' || d.location == _selectedLocation;
+      return matchSpec && matchSearch && matchLoc;
     }).toList();
   }
 
@@ -426,6 +432,7 @@ class _HouseCallsScreenState extends State<HouseCallsScreen>
   Widget _buildBookTab() {
     return Column(
       children: [
+        _buildLocationAndBodyMapRow(),
         _buildSearchAndFilter(),
         _buildSpecializationChips(),
         Expanded(
@@ -449,6 +456,92 @@ class _HouseCallsScreenState extends State<HouseCallsScreen>
     );
   }
 
+  Widget _buildLocationAndBodyMapRow() {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 0),
+      child: Row(
+        children: [
+          // Location Dropdown
+          Expanded(
+            flex: 3,
+            child: Container(
+              height: 42,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: AppColors.bgPage,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE3EAF2), width: 0.5),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.location_on_rounded, color: AppColors.teal, size: 16),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _selectedLocation,
+                        isExpanded: true,
+                        icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: AppColors.textHint),
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                        onChanged: (v) => setState(() => _selectedLocation = v!),
+                        items: ['Current Location', 'Anywhere', 'Hyderabad', 'Bangalore', 'Chennai', 'Mumbai', 'Delhi', 'Pune']
+                            .map((l) => DropdownMenuItem(value: l, child: Text(l)))
+                            .toList(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          // Body Map Button
+          Expanded(
+            flex: 2,
+            child: GestureDetector(
+              onTap: _openBodyMap,
+              child: Container(
+                height: 42,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: [AppColors.blue, Color(0xFF534AB7)]),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.accessibility_new_rounded, color: Colors.white, size: 16),
+                    SizedBox(width: 6),
+                    Text('Body Map', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _openBodyMap() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const BodyMapScreen(gender: 'male'),
+      ),
+    );
+    if (result != null && result is List<String> && result.isNotEmpty) {
+      // BodyMapScreen returns a list of selected parts. 
+      // E.g. ['head', 'chest']. We'll just search for the first part's translated or raw label
+      setState(() {
+        _searchQuery = result.first;
+        _searchCtrl.text = _searchQuery;
+        // Optionally set to 'all' specs to let search do its job
+        _selectedSpec = 'all';
+      });
+    }
+  }
+
   Widget _buildSearchAndFilter() {
     return Container(
       color: Colors.white,
@@ -457,6 +550,7 @@ class _HouseCallsScreenState extends State<HouseCallsScreen>
         children: [
           Expanded(
             child: Container(
+              height: 42,
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
                 color: AppColors.bgPage,
@@ -479,7 +573,7 @@ class _HouseCallsScreenState extends State<HouseCallsScreen>
                             color: AppColors.textHint, fontSize: 12),
                         border: InputBorder.none,
                         contentPadding:
-                            EdgeInsets.symmetric(vertical: 10),
+                            EdgeInsets.symmetric(vertical: 12), // Adjusted for height 42
                       ),
                       style: const TextStyle(
                           fontSize: 13, color: AppColors.textPrimary),

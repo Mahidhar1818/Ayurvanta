@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:animate_do/animate_do.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../../../core/services/razorpay_service.dart';
 
 // ── Colors ────────────────────────────────────────────────
 class _C {
@@ -349,7 +350,8 @@ const _symptomCategories = [
 // MAIN SCREEN — STEP CONTROLLER
 // ════════════════════════════════════════════════════════════
 class OPRegistrationScreen extends StatefulWidget {
-  const OPRegistrationScreen({super.key});
+  final bool isEmergency;
+  const OPRegistrationScreen({super.key, this.isEmergency = false});
 
   @override
   State<OPRegistrationScreen> createState() => _OPRegistrationScreenState();
@@ -365,6 +367,9 @@ class _OPRegistrationScreenState extends State<OPRegistrationScreen> {
   final _ayurCtrl    = TextEditingController();
   String _gender     = 'Male';
   String _bloodGroup = 'B+';
+
+  RazorpayService? _razorpay;
+  bool _processingPayment = false;
 
   // Symptom
   SymptomCategory? _symptomCat;
@@ -388,9 +393,38 @@ class _OPRegistrationScreenState extends State<OPRegistrationScreen> {
   String _tokenNumber = '';
 
   @override
+  void initState() {
+    super.initState();
+    _razorpay = RazorpayService(
+      onSuccess: (id) {
+        if (!mounted) return;
+        setState(() {
+          _processingPayment = false;
+          _tokenNumber = 'OP-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+          _step = 5;
+        });
+        _fetchFirstAid();
+      },
+      onFailure: (err) {
+        if (!mounted) return;
+        setState(() => _processingPayment = false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Payment Failed: $err'),
+          backgroundColor: _C.danger,
+        ));
+      },
+      onExternalWallet: () {
+        if (!mounted) return;
+        setState(() => _processingPayment = false);
+      },
+    );
+  }
+
+  @override
   void dispose() {
     _nameCtrl.dispose(); _ageCtrl.dispose(); _phoneCtrl.dispose();
     _ayurCtrl.dispose(); _symptomDescCtrl.dispose(); _upiCtrl.dispose();
+    _razorpay?.dispose();
     super.dispose();
   }
 
@@ -531,10 +565,22 @@ Use plain language, avoid medical jargon.'''
 
   void _next() {
     if (_step == 4) {
-      // Payment → fetch first aid + show token
-      _tokenNumber = 'OP-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
-      _step = 5;
-      _fetchFirstAid();
+      if (_payMethod == 'cash') {
+        _tokenNumber = 'OP-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+        _step = 5;
+        _fetchFirstAid();
+      } else {
+        setState(() => _processingPayment = true);
+        _razorpay?.openCheckout(
+          amountInPaise: (_selectedDoctor?.consultFee.toInt() ?? 0) * 100,
+          description: 'OP Appointment - ${_selectedDoctor?.name}',
+          userName: _nameCtrl.text.trim(),
+          userEmail: 'patient@ayurvanta.in',
+          userPhone: _phoneCtrl.text.trim(),
+          orderId: 'OP_${DateTime.now().millisecondsSinceEpoch}',
+        );
+        return; // Don't call setState below to avoid overwriting loading state immediately
+      }
     } else {
       setState(() => _step++);
     }
@@ -610,8 +656,8 @@ Use plain language, avoid medical jargon.'''
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: _C.teal, width: 0.5),
             ),
-            child: const Text('OP Registration',
-                style: TextStyle(color: _C.teal, fontSize: 10, fontWeight: FontWeight.w700)),
+            child: Text(widget.isEmergency ? 'Emergency Appointment' : 'OP Registration',
+                style: const TextStyle(color: _C.teal, fontSize: 10, fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -664,7 +710,7 @@ Use plain language, avoid medical jargon.'''
       child: SizedBox(
         width: double.infinity, height: 52,
         child: ElevatedButton(
-          onPressed: canProceed ? _next : null,
+          onPressed: (canProceed && !_processingPayment) ? _next : null,
           style: ElevatedButton.styleFrom(
             backgroundColor: _C.teal,
             foregroundColor: Colors.white,
@@ -672,8 +718,13 @@ Use plain language, avoid medical jargon.'''
             disabledBackgroundColor: _C.muted,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           ),
-          child: Text(labels[_step],
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+          child: _processingPayment
+              ? const SizedBox(
+                  width: 24, height: 24,
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                )
+              : Text(labels[_step],
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
         ),
       ),
     );
@@ -743,6 +794,7 @@ Use plain language, avoid medical jargon.'''
         symptom: _symptomCat!,
         firstAidContent: _firstAidContent,
         isLoading: _firstAidLoading,
+        isEmergency: widget.isEmergency,
         onDone: () => Navigator.pop(context),
       );
       default: return const SizedBox();
@@ -1182,7 +1234,7 @@ class _StepSchedule extends StatelessWidget {
       return [label, '${d.day} ${['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.month]}'];
     }
 
-    final currentSlots = selectedDayIdx < dateKeys.length ? doctor.schedule[dateKeys[selectedDayIdx]] ?? [] : [];
+    final List<TimeSlot> currentSlots = selectedDayIdx < dateKeys.length ? doctor.schedule[dateKeys[selectedDayIdx]] ?? <TimeSlot>[] : <TimeSlot>[];
     final morningSlots = currentSlots.where((s) => s.period == 'Morning').toList();
     final afternoonSlots = currentSlots.where((s) => s.period == 'Afternoon').toList();
     final eveningSlots = currentSlots.where((s) => s.period == 'Evening').toList();
@@ -1554,12 +1606,14 @@ class _StepFirstAid extends StatelessWidget {
   final int dayIdx;
   final SymptomCategory symptom;
   final bool isLoading;
+  final bool isEmergency;
   final VoidCallback onDone;
 
   const _StepFirstAid({
     required this.patient, required this.token, required this.firstAidContent,
     required this.doctor, required this.slot, required this.dayIdx,
     required this.symptom, required this.isLoading, required this.onDone,
+    this.isEmergency = false,
   });
 
   @override
@@ -1582,8 +1636,8 @@ class _StepFirstAid extends StatelessWidget {
             child: Column(children: [
               const Text('✅', style: TextStyle(fontSize: 40)),
               const SizedBox(height: 10),
-              const Text('Booking Confirmed!',
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
+              Text(isEmergency ? 'Emergency Slot Confirmed!' : 'Booking Confirmed!',
+                  style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
               const SizedBox(height: 6),
               Text('Thank you, $patient.',
                   style: const TextStyle(color: Colors.white70, fontSize: 13)),

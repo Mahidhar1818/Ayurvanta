@@ -5,7 +5,7 @@ import '../../bloc/exercise/exercise_bloc.dart';
 import '../../models/exercise_model.dart';
 import '../../services/exercise_diet_service.dart';
 import '../../core/services/api_service.dart';
-import '../../core/widgets/loading_widget.dart';
+
 
 class AssignExerciseScreen extends StatefulWidget {
   final String patientId;

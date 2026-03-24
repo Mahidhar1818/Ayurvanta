@@ -8,6 +8,11 @@ import '../../../core/services/auth_preference_service.dart';
 import '../../onboarding/screens/language_selection_screen.dart';
 import '../../onboarding/screens/module_selector_screen.dart';
 import '../../../core/translations/app_translations.dart';
+import '../../solo_safety/screens/solo_safety_screen.dart';
+import 'edit_profile_screen.dart';
+import 'privacy_screen.dart';
+import 'help_support_screen.dart';
+
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -216,7 +221,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   )),
               ),
               GestureDetector(
-                onTap: () {},
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen())),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 14, vertical: 8),
@@ -531,7 +536,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           iconBg: const Color(0xFFFAEEDA),
           iconColor: const Color(0xFFBA7517),
           label: context.tr('guardians'),
-          onTap: () {},
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SoloSafetyScreen())),
         ),
         const SizedBox(height: 8),
         _NavTile(
@@ -539,7 +544,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           iconBg: const Color(0xFFE3EAF2),
           iconColor: AppColors.navyLight,
           label: context.tr('privacy'),
-          onTap: () {},
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PrivacyScreen())),
         ),
         const SizedBox(height: 8),
         _NavTile(
@@ -547,7 +552,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           iconBg: const Color(0xFFE3EAF2),
           iconColor: AppColors.navyLight,
           label: context.tr('help'),
-          onTap: () {},
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HelpSupportScreen())),
         ),
         const SizedBox(height: 8),
         _NavTile(

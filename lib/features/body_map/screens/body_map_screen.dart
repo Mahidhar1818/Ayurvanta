@@ -303,24 +303,33 @@ class _BodyMapScreenState extends State<BodyMapScreen>
               builder: (ctx, constraints) {
                 final w = constraints.maxWidth;
                 final h = constraints.maxHeight;
-                return GestureDetector(
-                  onTapDown: (details) {
-                    final dx =
-                        details.localPosition.dx / w;
-                    final dy =
-                        details.localPosition.dy / h;
-                    _handleBodyTap(dx, dy);
-                  },
-                  child: CustomPaint(
-                    size: Size(w, h),
-                    painter: _BodyPainter(
-                      parts: _filteredParts,
-                      selected: _selected,
-                      skinColor: skinColor,
-                      isFemale: isFemale,
-                      lang: _lang,
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Background Silhouette
+                    Icon(
+                      isFemale ? Icons.woman_rounded : Icons.man_rounded,
+                      size: h * 0.95,
+                      color: skinColor.withOpacity(0.3),
                     ),
-                  ),
+                    GestureDetector(
+                      onTapDown: (details) {
+                        final dx = details.localPosition.dx / w;
+                        final dy = details.localPosition.dy / h;
+                        _handleBodyTap(dx, dy);
+                      },
+                      child: CustomPaint(
+                        size: Size(w, h),
+                        painter: _BodyPainter(
+                          parts: _filteredParts,
+                          selected: _selected,
+                          skinColor: skinColor,
+                          isFemale: isFemale,
+                          lang: _lang,
+                        ),
+                      ),
+                    ),
+                  ],
                 );
               },
             ),
@@ -551,8 +560,8 @@ class _BodyMapScreenState extends State<BodyMapScreen>
             child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
+              Navigator.pop(context); // popup
+              Navigator.pop(context, _selected.toList()); // screen
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.blue,
@@ -630,24 +639,49 @@ class _BodyPainter extends CustomPainter {
 
       final paint = Paint()
         ..color = isSelected
-            ? part.systemColor.withOpacity(0.35)
-            : skinColor.withOpacity(0.8)
+            ? part.systemColor.withOpacity(0.85)
+            : skinColor.withOpacity(0.9)
         ..style = PaintingStyle.fill;
 
       final strokePaint = Paint()
         ..color = isSelected
             ? part.systemColor
-            : part.systemColor.withOpacity(0.4)
+            : part.systemColor.withOpacity(0.5)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = isSelected ? 2.0 : 0.8;
+        ..strokeWidth = isSelected ? 2.0 : 1.0;
 
       final rect = RRect.fromRectAndRadius(
         Rect.fromCenter(
             center: Offset(cx, cy), width: w, height: h),
-        const Radius.circular(8),
+        Radius.circular(w * 0.2), // Rounded like a 3D pill
       );
 
+      // 3D Shadow
+      canvas.drawRRect(
+        rect.shift(const Offset(2, 4)),
+        Paint()
+          ..color = Colors.black.withOpacity(0.2)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+      );
+
+      // Base color
       canvas.drawRRect(rect, paint);
+
+      // 3D Specular Highlight Gradient
+      final gradient = LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Colors.white.withOpacity(0.6),
+          Colors.white.withOpacity(0.0),
+          Colors.black.withOpacity(0.1),
+        ],
+        stops: const [0.0, 0.5, 1.0],
+      ).createShader(rect.outerRect);
+      
+      canvas.drawRRect(rect, Paint()..shader = gradient);
+
+      // Stroke
       canvas.drawRRect(rect, strokePaint);
 
       // Label
@@ -659,11 +693,14 @@ class _BodyPainter extends CustomPainter {
           style: TextStyle(
             fontSize: (w * 0.22).clamp(6.0, 9.0),
             fontWeight: isSelected
-                ? FontWeight.w800
-                : FontWeight.w600,
+                ? FontWeight.w900
+                : FontWeight.w700,
             color: isSelected
-                ? part.systemColor
-                : part.systemColor.withOpacity(0.7),
+                ? Colors.white
+                : part.systemColor.withOpacity(0.9),
+            shadows: isSelected ? [
+              Shadow(color: Colors.black.withOpacity(0.3), blurRadius: 2, offset: const Offset(1,1))
+            ] : null,
           ),
         ),
         textDirection: TextDirection.ltr,

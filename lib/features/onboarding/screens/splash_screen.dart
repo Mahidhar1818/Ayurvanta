@@ -6,6 +6,7 @@ import '../../../core/translations/app_translations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'module_selector_screen.dart';
 import 'language_selection_screen.dart';
+import 'location_permission_screen.dart';
 import '../../home/screens/home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -44,17 +45,23 @@ class _SplashScreenState extends State<SplashScreen>
         await AuthPreferenceService.isLoggedIn();
     final prefs = await SharedPreferences.getInstance();
     final langSet = prefs.containsKey('language');
+    final locSet = prefs.containsKey('location_granted');
 
-    if (!loggedIn) {
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(
-              builder: (_) =>
-                  const ModuleSelectorScreen()));
-    } else if (!langSet) {
+    if (!langSet) {
       Navigator.pushReplacement(context,
           MaterialPageRoute(
               builder: (_) =>
                   const LanguageSelectionScreen()));
+    } else if (!locSet) {
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(
+              builder: (_) =>
+                  const LocationPermissionScreen()));
+    } else if (!loggedIn) {
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(
+              builder: (_) =>
+                  const ModuleSelectorScreen()));
     } else {
       Navigator.pushReplacement(context,
           MaterialPageRoute(

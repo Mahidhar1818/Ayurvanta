@@ -4,6 +4,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../appointments/screens/op_registration_screen.dart';
 
 // ═══════════════════════════════════════════════════
 // HOSPITAL MODEL
@@ -125,6 +126,7 @@ class _EmergencyScreenState extends State<EmergencyScreen>
   @override
   void initState() {
     super.initState();
+    _hospitals = _buildHospitals(17.4065, 78.4772);
     _pulseCtrl = AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 1600))..repeat();
@@ -291,6 +293,8 @@ class _EmergencyScreenState extends State<EmergencyScreen>
 
   void _sendAlert() {
     HapticFeedback.heavyImpact();
+    Future.delayed(const Duration(milliseconds: 300), () => HapticFeedback.heavyImpact());
+    Future.delayed(const Duration(milliseconds: 600), () => HapticFeedback.heavyImpact());
     setState(() => _isLoading = true);
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) setState(() { _isLoading = false; _alertSent = true; });
@@ -972,6 +976,28 @@ class _EmergencyScreenState extends State<EmergencyScreen>
                       fontWeight: FontWeight.w700)),
             ])))),
       ])),
+      const SizedBox(height: 16),
+      FadeInUp(delay: const Duration(milliseconds: 600),
+          child: SizedBox(
+            width: double.infinity,
+            height: 54,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pushReplacement(context, MaterialPageRoute(
+                  builder: (_) => const OPRegistrationScreen(isEmergency: true)
+                ));
+              },
+              icon: const Icon(Icons.flash_on_rounded, size: 20),
+              label: const Text('Book Priority Appointment',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFE8243A),
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+            ),
+          )),
       const SizedBox(height: 30),
     ]));
 

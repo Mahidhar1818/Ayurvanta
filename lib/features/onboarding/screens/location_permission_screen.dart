@@ -3,6 +3,9 @@ import 'package:animate_do/animate_do.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/translations/app_translations.dart';
+import '../../../core/services/auth_preference_service.dart';
+import 'module_selector_screen.dart';
 import '../../home/screens/home_screen.dart';
 
 class LocationPermissionScreen extends StatefulWidget {
@@ -24,9 +27,7 @@ class _LocationPermissionScreenState
       final serviceEnabled =
           await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        _showSnack(
-            'Location services are disabled. '
-            'Please enable them in settings.');
+        _showSnack(AppTranslations.instance.tr('location_services_disabled'));
         setState(() => _isLoading = false);
         return;
       }
@@ -38,16 +39,14 @@ class _LocationPermissionScreenState
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          _showSnack('Location permission denied.');
+          _showSnack(AppTranslations.instance.tr('location_permission_denied'));
           setState(() => _isLoading = false);
           return;
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        _showSnack(
-            'Location permission permanently denied. '
-            'Please enable from app settings.');
+        _showSnack(AppTranslations.instance.tr('location_permission_permanently_denied'));
         setState(() => _isLoading = false);
         return;
       }
@@ -64,11 +63,11 @@ class _LocationPermissionScreenState
       await prefs.setBool('location_granted', true);
 
       if (!mounted) return;
-      _showSnack('Location access granted! ✅');
+      _showSnack('${AppTranslations.instance.tr('location_access_granted')} ✅');
       await Future.delayed(const Duration(milliseconds: 800));
       _goHome();
     } catch (e) {
-      _showSnack('Could not get location. Please try again.');
+      _showSnack(AppTranslations.instance.tr('could_not_get_location'));
       setState(() => _isLoading = false);
     }
   }
@@ -79,10 +78,14 @@ class _LocationPermissionScreenState
     _goHome();
   }
 
-  void _goHome() {
+  void _goHome() async {
+    final loggedIn = await AuthPreferenceService.isLoggedIn();
+    if (!mounted) return;
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
+      MaterialPageRoute(
+        builder: (_) => loggedIn ? const HomeScreen() : const ModuleSelectorScreen(),
+      ),
       (_) => false,
     );
   }
@@ -132,10 +135,10 @@ class _LocationPermissionScreenState
               // Title
               FadeInUp(
                 delay: const Duration(milliseconds: 100),
-                child: const Text(
-                  'Find Hospitals\nNear You',
+                child: Text(
+                  AppTranslations.instance.tr('find_hospitals_near_you'),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
@@ -148,12 +151,10 @@ class _LocationPermissionScreenState
               // Description
               FadeInUp(
                 delay: const Duration(milliseconds: 150),
-                child: const Text(
-                  'Allow AyurVanta to access your location '
-                  'so we can show hospitals, doctors, '
-                  'and pharmacies near you.',
+                child: Text(
+                  AppTranslations.instance.tr('allow_location_access_desc'),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: AppColors.textHint,
                     fontSize: 14,
                     height: 1.6,
@@ -170,33 +171,29 @@ class _LocationPermissionScreenState
                     _FeatureRow(
                       icon: Icons.local_hospital_rounded,
                       color: AppColors.blue,
-                      title: 'Nearby Hospitals',
-                      subtitle:
-                          'See hospitals & clinics in your area',
+                      title: AppTranslations.instance.tr('nearby_hospitals'),
+                      subtitle: AppTranslations.instance.tr('see_hospitals_clinics'),
                     ),
                     const SizedBox(height: 10),
                     _FeatureRow(
                       icon: Icons.airport_shuttle_rounded,
                       color: AppColors.emergency,
-                      title: 'Fast Ambulance Dispatch',
-                      subtitle:
-                          'Emergency SOS uses your live location',
+                      title: AppTranslations.instance.tr('fast_ambulance_dispatch'),
+                      subtitle: AppTranslations.instance.tr('emergency_sos_live_location'),
                     ),
                     const SizedBox(height: 10),
                     _FeatureRow(
                       icon: Icons.medication_rounded,
                       color: AppColors.teal,
-                      title: 'Local Pharmacies',
-                      subtitle:
-                          'Medicine delivery from nearby stores',
+                      title: AppTranslations.instance.tr('local_pharmacies'),
+                      subtitle: AppTranslations.instance.tr('medicine_delivery_nearby'),
                     ),
                     const SizedBox(height: 10),
                     _FeatureRow(
                       icon: Icons.directions_rounded,
                       color: const Color(0xFF534AB7),
-                      title: 'Navigation & Directions',
-                      subtitle:
-                          'Get directions to hospitals instantly',
+                      title: AppTranslations.instance.tr('navigation_directions'),
+                      subtitle: AppTranslations.instance.tr('get_directions_instantly'),
                     ),
                   ],
                 ),
@@ -225,17 +222,14 @@ class _LocationPermissionScreenState
                             child: CircularProgressIndicator(
                                 color: Colors.white,
                                 strokeWidth: 2.5))
-                        : const Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.center,
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(
-                                  Icons.location_on_rounded,
-                                  size: 20),
-                              SizedBox(width: 8),
+                              const Icon(Icons.location_on_rounded, size: 20),
+                              const SizedBox(width: 8),
                               Text(
-                                'Allow Location Access',
-                                style: TextStyle(
+                                AppTranslations.instance.tr('allow_location_access'),
+                                style: const TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -252,11 +246,11 @@ class _LocationPermissionScreenState
                 delay: const Duration(milliseconds: 350),
                 child: GestureDetector(
                   onTap: _skipLocation,
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
                     child: Text(
-                      'Skip for now',
-                      style: TextStyle(
+                      AppTranslations.instance.tr('skip_for_now'),
+                      style: const TextStyle(
                         color: AppColors.textHint,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,

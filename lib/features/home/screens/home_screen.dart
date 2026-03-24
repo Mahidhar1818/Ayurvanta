@@ -19,6 +19,7 @@ import '../../solo_safety/screens/solo_safety_screen.dart';
 import '../../solo_safety/screens/sensor_sos_screen.dart';
 import '../../medicines/screens/medicine_reminder_screen.dart';
 import '../../housecalls/screens/house_calls_screen.dart';
+import '../../exercises/screens/ortho_exercises_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -933,6 +934,11 @@ class _ExploreRow extends StatelessWidget {
           () => Navigator.push(context,
               MaterialPageRoute(builder: (_) =>
                   const DietMapScreen()))),
+      ('🦴', context.tr('ortho_exercises') ?? 'Ortho Exercises',
+          const Color(0xFFFCEBEB),
+          () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) =>
+                  const OrthoExercisesScreen()))),
       ('💼', context.tr('opportunities'),
           const Color(0xFFEEEDFE),
           () => Navigator.push(context,
