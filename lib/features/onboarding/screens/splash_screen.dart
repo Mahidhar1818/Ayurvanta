@@ -89,15 +89,26 @@ class _SplashScreenState extends State<SplashScreen>
                   milliseconds: 700),
               child: Center(
                 child: Container(
-                  width: 100, height: 100,
+                  width: 120, height: 120,
                   decoration: BoxDecoration(
-                    color: AppColors.teal,
+                    color: Colors.white,
                     borderRadius:
                         BorderRadius.circular(28),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.teal.withOpacity(0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
                   ),
-                  child: const Icon(
-                    Icons.health_and_safety_rounded,
-                    color: Colors.white, size: 54),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(28),
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
               ),
             ),

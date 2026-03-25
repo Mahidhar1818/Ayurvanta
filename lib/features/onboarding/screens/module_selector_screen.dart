@@ -4,6 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/models/app_module.dart';
 import '../../auth/screens/auth_screen.dart';
 import '../../hospital/screens/hospital_role_selector_screen.dart';
+import '../../pharmacy/screens/delivery_login_screen.dart';
 
 class ModuleSelectorScreen extends StatelessWidget {
   const ModuleSelectorScreen({super.key});
@@ -29,12 +30,16 @@ class ModuleSelectorScreen extends StatelessWidget {
                       Container(
                         width: 40, height: 40,
                         decoration: BoxDecoration(
-                          color: AppColors.teal,
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(
-                            Icons.health_and_safety_rounded,
-                            color: Colors.white, size: 22),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.asset(
+                            'assets/images/logo.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                       ),
                       const SizedBox(width: 10),
                       const Text('AyurVanta',
@@ -85,8 +90,11 @@ class ModuleSelectorScreen extends StatelessWidget {
                         child: _ModuleCard(
                           info: mod,
                           onTap: () {
-                            // Hospital goes to role selector
-                            if (mod.module == AppModule.hospital) {
+                            if (mod.module == AppModule.delivery) {
+                              Navigator.push(context,
+                                  MaterialPageRoute(builder: (_) =>
+                                  const DeliveryLoginScreen()));
+                            } else if (mod.module == AppModule.hospital) {
                               Navigator.push(context,
                                   MaterialPageRoute(builder: (_) =>
                                   const HospitalRoleSelectorScreen()));

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
+  // Hospital/Pharmacy Theme
   static const Color navyDark      = Color(0xFF0B1A2C);
   static const Color navyMid       = Color(0xFF1A2E44);
   static const Color navyLight     = Color(0xFF4A6080);
@@ -15,4 +16,10 @@ class AppColors {
   static const Color textPrimary   = Color(0xFF1A2E44);
   static const Color textSecondary = Color(0xFF6B8099);
   static const Color textHint      = Color(0xFF8BAED4);
+  
+  // Delivery Partner Specific (Zomato-inspired but Hospital-toned)
+  static const Color deliveryPrimary = Color(0xFFFF6B6B); // Medicine Emergency Red
+  static const Color deliverySecondary = Color(0xFF2D3436);
+  static const Color hospitalBlue = Color(0xFF00B4D8);
+  static const Color medicalGreen = Color(0xFF2ECC71);
 }

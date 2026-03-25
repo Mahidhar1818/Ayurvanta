@@ -132,11 +132,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                           width: 48,
                           height: 48,
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF27D095), AppColors.teal],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
@@ -146,8 +142,13 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                               ),
                             ],
                           ),
-                          child: const Icon(Icons.spa_rounded,
-                              color: Colors.white, size: 28),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.asset(
+                              'assets/images/logo.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
                         const SizedBox(width: 14),
                         const Text(
