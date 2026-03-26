@@ -4,6 +4,7 @@ import 'package:animate_do/animate_do.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/models/app_module.dart';
 import '../../../core/services/auth_preference_service.dart';
+import '../../../core/widgets/ayurvanta_logo.dart';
 import 'admin/admin_dashboard_screen.dart';
 import 'doctor/doctor_dashboard_screen.dart';
 import 'receptionist/receptionist_dashboard_screen.dart';
@@ -150,9 +151,9 @@ class _HospitalLoginScreenState extends State<HospitalLoginScreen> {
                   // Welcome text
                   FadeInLeft(
                     delay: const Duration(milliseconds: 100),
-                    child: Text(
+                    child: const Text(
                       'Sign in to continue',
-                      style: const TextStyle(color: Colors.white,
+                      style: TextStyle(color: Colors.white,
                           fontSize: 26, fontWeight: FontWeight.w800),
                     ),
                   ),
@@ -361,16 +362,7 @@ class _HospitalLoginScreenState extends State<HospitalLoginScreen> {
             ),
           ),
           const SizedBox(width: 12),
-          Container(
-            width: 36, height: 36,
-            decoration: BoxDecoration(
-              color: widget.role.iconBg,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Center(
-              child: Text(widget.role.emoji,
-                  style: const TextStyle(fontSize: 18))),
-          ),
+          const AyurVantaLogo(size: 32, showText: false),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -526,15 +518,7 @@ class _ForgotPasswordSheetState
             // Header
             Row(
               children: [
-                Container(
-                  width: 40, height: 40,
-                  decoration: BoxDecoration(
-                    color: widget.role.iconBg.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(11),
-                  ),
-                  child: Icon(Icons.lock_reset_rounded,
-                      color: widget.role.textColor, size: 20),
-                ),
+                const AyurVantaLogo(size: 32, showText: false),
                 const SizedBox(width: 12),
                 const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/ayurvanta_logo.dart';
 import '../services/delivery_service.dart';
-import '../../../core/widgets/loading_widget.dart';
 import 'delivery_dashboard_screen.dart';
 
 class DeliveryLoginScreen extends StatefulWidget {
@@ -77,18 +77,7 @@ class _DeliveryLoginScreenState extends State<DeliveryLoginScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.hospitalBlue.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Icon(
-              Icons.medical_services_rounded,
-              size: 40,
-              color: AppColors.hospitalBlue,
-            ),
-          ),
+          const AyurVantaLogo(size: 80, showText: false),
           const SizedBox(height: 24),
           const Text(
             'Pharmacy Network',

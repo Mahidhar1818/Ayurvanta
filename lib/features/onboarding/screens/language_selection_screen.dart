@@ -3,14 +3,16 @@ import 'package:animate_do/animate_do.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/translations/app_translations.dart';
 import '../../../core/services/auth_preference_service.dart';
+import '../../../core/widgets/ayurvanta_logo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'module_selector_screen.dart';
 import '../../home/screens/home_screen.dart';
-
 import 'location_permission_screen.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
-  const LanguageSelectionScreen({super.key});
+  final bool isFirstTime;
+  const LanguageSelectionScreen({Key? key, this.isFirstTime = true}) : super(key: key);
+
   @override
   State<LanguageSelectionScreen> createState() => _LanguageSelectionScreenState();
 }
@@ -24,7 +26,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
     {'code': 'te', 'name': 'Telugu',     'native': 'తెలుగు',     'flag': '🇮🇳'},
     {'code': 'hi', 'name': 'Hindi',      'native': 'हिन्दी',      'flag': '🇮🇳'},
     {'code': 'ta', 'name': 'Tamil',      'native': 'தமிழ்',      'flag': '🇮🇳'},
-    {'code': 'mr', 'name': 'Marathi',    'native': 'मराठी',      'flag': '🇮🇳'},
+    {'code': 'mr', 'name': 'Marathi',    'native': 'मరాઠી',      'flag': '🇮🇳'},
     {'code': 'kn', 'name': 'Kannada',    'native': 'ಕನ್ನಡ',      'flag': '🇮🇳'},
     {'code': 'ml', 'name': 'Malayalam',  'native': 'മലയാളം',     'flag': '🇮🇳'},
     {'code': 'bn', 'name': 'Bengali',    'native': 'বাংলা',      'flag': '🇮🇳'},
@@ -43,174 +45,191 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
     if (!mounted) return;
     setState(() => _isLoading = false);
     
-    if (!locSet) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const LocationPermissionScreen(),
-        ),
-      );
+    if (widget.isFirstTime) {
+      if (!locSet) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const LocationPermissionScreen(),
+          ),
+        );
+      } else {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (_) => loggedIn ? const HomeScreen() : const ModuleSelectorScreen(),
+          ),
+          (_) => false,
+        );
+      }
     } else {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (_) => loggedIn ? const HomeScreen() : const ModuleSelectorScreen(),
-        ),
-        (_) => false,
-      );
+      Navigator.pop(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.navyDark,
-      body: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: 32),
-            // Logo + title
-            FadeInDown(
-              child: Column(
-                children: [
-                  Container(
-                    width: 72, height: 72,
-                    decoration: BoxDecoration(
-                      color: AppColors.teal,
-                      borderRadius: BorderRadius.circular(20),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF1A5F7A),
+              Color(0xFF159957),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Logo Section
+              Expanded(
+                flex: 2,
+                child: Center(
+                  child: FadeInDown(
+                    child: const AyurVantaLogo(
+                      size: 100,
+                      showText: true,
+                      textColor: Colors.white,
                     ),
-                    child: const Icon(Icons.health_and_safety_rounded,
-                        color: Colors.white, size: 40),
-                  ),
-                  const SizedBox(height: 14),
-                  const Text('AyurVanta',
-                      style: TextStyle(color: Colors.white,
-                          fontSize: 26, fontWeight: FontWeight.w800)),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Choose Your Language\nభాష ఎంచుకోండి • भाषा चुनें',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: AppColors.textHint,
-                        fontSize: 13, height: 1.5),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            // Language list
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                itemCount: _languages.length,
-                itemBuilder: (_, i) {
-                  final lang = _languages[i];
-                  final isSelected = _selected == lang['code'];
-                  return FadeInUp(
-                    delay: Duration(milliseconds: i * 50),
-                    child: GestureDetector(
-                      onTap: () =>
-                          setState(() => _selected = lang['code']!),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 180),
-                        margin: const EdgeInsets.only(bottom: 10),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 14),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? AppColors.teal.withOpacity(0.15)
-                              : Colors.white.withOpacity(0.06),
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: isSelected
-                                ? AppColors.teal
-                                : Colors.white.withOpacity(0.1),
-                            width: isSelected ? 1.5 : 0.5,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Text(lang['flag']!,
-                                style: const TextStyle(fontSize: 24)),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                children: [
-                                  Text(lang['native']!,
-                                      style: TextStyle(
-                                        color: isSelected
-                                            ? AppColors.teal
-                                            : Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
-                                      )),
-                                  Text(lang['name']!,
-                                      style: const TextStyle(
-                                          color: AppColors.textHint,
-                                          fontSize: 12)),
-                                ],
-                              ),
-                            ),
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 180),
-                              width: 22, height: 22,
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? AppColors.teal
-                                    : Colors.transparent,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: isSelected
-                                      ? AppColors.teal
-                                      : Colors.white30,
-                                  width: 1.5,
-                                ),
-                              ),
-                              child: isSelected
-                                  ? const Icon(Icons.check_rounded,
-                                      color: Colors.white, size: 13)
-                                  : null,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            // Continue button
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-              child: FadeInUp(
-                delay: const Duration(milliseconds: 500),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 54,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _continue,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.teal,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14)),
-                    ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            width: 22, height: 22,
-                            child: CircularProgressIndicator(
-                                color: Colors.white, strokeWidth: 2.5))
-                        : const Text('Continue  •  కొనసాగించు  •  जारी रखें',
-                            style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700)),
                   ),
                 ),
               ),
-            ),
-          ],
+              // Language Selection Section
+              Expanded(
+                flex: 3,
+                child: Container(
+                  margin: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.isFirstTime 
+                            ? 'Choose Your Language' 
+                            : 'Select Language',
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1A5F7A),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        widget.isFirstTime
+                            ? 'Select your preferred language for the app'
+                            : 'Change your app language',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: _languages.length,
+                          itemBuilder: (context, index) {
+                            final lang = _languages[index];
+                            final isSelected = _selected == lang['code'];
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: isSelected 
+                                      ? const Color(0xFF1A5F7A) 
+                                      : Colors.grey[300]!,
+                                  width: isSelected ? 2 : 1,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: RadioListTile<String>(
+                                value: lang['code']!,
+                                groupValue: _selected,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selected = value!;
+                                  });
+                                },
+                                title: Row(
+                                  children: [
+                                    Text(
+                                      lang['flag']!,
+                                      style: const TextStyle(fontSize: 24),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          lang['name']!,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          lang['native']!,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                activeColor: const Color(0xFF1A5F7A),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: ElevatedButton(
+                          onPressed: _isLoading ? null : _continue,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF1A5F7A),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: _isLoading
+                              ? const SizedBox(
+                                  width: 24, height: 24,
+                                  child: CircularProgressIndicator(
+                                      color: Colors.white, strokeWidth: 2.5))
+                              : Text(
+                                  widget.isFirstTime ? 'Continue' : 'Apply',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

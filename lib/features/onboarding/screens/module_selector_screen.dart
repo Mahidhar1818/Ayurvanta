@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/models/app_module.dart';
+import '../../../core/widgets/ayurvanta_logo.dart';
 import '../../auth/screens/auth_screen.dart';
 import '../../hospital/screens/hospital_role_selector_screen.dart';
 import '../../pharmacy/screens/delivery_login_screen.dart';
@@ -27,20 +28,7 @@ class ModuleSelectorScreen extends StatelessWidget {
                 FadeInDown(
                   child: Row(
                     children: [
-                      Container(
-                        width: 40, height: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.asset(
-                            'assets/images/logo.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
+                      const AyurVantaLogo(size: 40, showText: false),
                       const SizedBox(width: 10),
                       const Text('AyurVanta',
                           style: TextStyle(color: Colors.white,

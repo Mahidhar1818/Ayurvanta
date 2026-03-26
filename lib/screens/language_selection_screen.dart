@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../core/localization/app_localizations.dart';
 import '../bloc/locale/locale_cubit.dart';
+import '../core/widgets/ayurvanta_logo.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
   final bool isFirstTime;
@@ -19,8 +20,8 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
     {'code': 'te', 'name': 'Telugu', 'native': 'తెలుగు', 'flag': '🇮🇳'},
     {'code': 'ta', 'name': 'Tamil', 'native': 'தமிழ்', 'flag': '🇮🇳'},
     {'code': 'kn', 'name': 'Kannada', 'native': 'ಕನ್ನಡ', 'flag': '🇮🇳'},
-    {'code': 'ml', 'name': 'Malayalam', 'native': 'മലയാളം', 'flag': '🇮🇳'},
-    {'code': 'mr', 'name': 'Marathi', 'native': 'मराठी', 'flag': '🇮🇳'},
+    {'code': 'ml', 'name': 'Malayalam', 'native': 'മലയാളం', 'flag': '🇮🇳'},
+    {'code': 'mr', 'name': 'Marathi', 'native': 'मరాठी', 'flag': '🇮🇳'},
     {'code': 'bn', 'name': 'Bengali', 'native': 'বাংলা', 'flag': '🇮🇳'},
   ];
 
@@ -30,7 +31,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -44,40 +45,18 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
           child: Column(
             children: [
               if (widget.isFirstTime)
-                Padding(
+                const Padding(
                   padding: EdgeInsets.only(top: 50),
-                  child: Column(
-                    children: [
-                      Image.asset(
-                        'assets/images/ayurvanta_logo.png',
-                        height: 100,
-                        color: Colors.white,
-                        errorBuilder: (context, error, stackTrace) => Icon(Icons.health_and_safety, size: 100, color: Colors.white),
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        'AyurVanta',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        'Your Health Companion',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white70,
-                        ),
-                      ),
-                    ],
+                  child: AyurVantaLogo(
+                    size: 100,
+                    showText: true,
+                    textColor: Colors.white,
                   ),
                 ),
               Expanded(
                 child: Container(
-                  margin: EdgeInsets.all(20),
-                  padding: EdgeInsets.all(20),
+                  margin: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -85,7 +64,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
                         blurRadius: 10,
-                        offset: Offset(0, 5),
+                        offset: const Offset(0, 5),
                       ),
                     ],
                   ),
@@ -94,13 +73,13 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                     children: [
                       Text(
                         widget.isFirstTime ? 'Choose Your Language' : 'Select Language',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF1A5F7A),
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Text(
                         widget.isFirstTime
                             ? 'Select your preferred language for the app'
@@ -110,7 +89,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                           color: Colors.grey[600],
                         ),
                       ),
-                      SizedBox(height: 30),
+                      const SizedBox(height: 30),
                       Expanded(
                         child: ListView.builder(
                           itemCount: _languages.length,
@@ -118,10 +97,10 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                             final lang = _languages[index];
                             final isSelected = _selectedLanguage == lang['code'];
                             return Container(
-                              margin: EdgeInsets.only(bottom: 12),
+                              margin: const EdgeInsets.only(bottom: 12),
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: isSelected ? Color(0xFF1A5F7A) : Colors.grey[300]!,
+                                  color: isSelected ? const Color(0xFF1A5F7A) : Colors.grey[300]!,
                                   width: isSelected ? 2 : 1,
                                 ),
                                 borderRadius: BorderRadius.circular(12),
@@ -138,15 +117,15 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                                   children: [
                                     Text(
                                       lang['flag'],
-                                      style: TextStyle(fontSize: 24),
+                                      style: const TextStyle(fontSize: 24),
                                     ),
-                                    SizedBox(width: 12),
+                                    const SizedBox(width: 12),
                                     Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           lang['name'],
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -161,36 +140,38 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                                     ),
                                   ],
                                 ),
-                                activeColor: Color(0xFF1A5F7A),
+                                activeColor: const Color(0xFF1A5F7A),
                               ),
                             );
                           },
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () async {
                           final locale = Locale(_selectedLanguage);
                           await AppLocalizations.saveLocale(locale);
-                          context.read<LocaleCubit>().setLocale(locale);
-                          
-                          if (widget.isFirstTime) {
-                            Navigator.pushReplacementNamed(context, '/login');
-                          } else {
-                            Navigator.pop(context);
+                          if (context.mounted) {
+                            context.read<LocaleCubit>().setLocale(locale);
+                            
+                            if (widget.isFirstTime) {
+                              Navigator.pushReplacementNamed(context, '/login');
+                            } else {
+                              Navigator.pop(context);
+                            }
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF1A5F7A),
-                          padding: EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor: const Color(0xFF1A5F7A),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          minimumSize: Size(double.infinity, 50),
+                          minimumSize: const Size(double.infinity, 50),
                         ),
                         child: Text(
                           widget.isFirstTime ? 'Continue' : 'Apply',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),

@@ -7,104 +7,90 @@ class DeliveryService {
 
   DeliveryService() : _apiService = ApiService();
 
+  // Session state for Demo
+  static bool _currentAvailability = false;
+  static final List<DeliveryOrder> _demoAvailableOrders = [
+    DeliveryOrder(
+      id: 'demo_ord_1',
+      orderId: 'RX-88291',
+      customerId: 'cust_001',
+      customerName: 'Arjun Sharma',
+      customerPhone: '9876543210',
+      customerAddress: 'Flat 402, Green Heights, Hitech City',
+      customerLocation: const LatLng(17.4486, 78.3908),
+      items: [
+        DeliveryOrderItem(id: 'i1', name: 'Amoxicillin 500mg', quantity: 1, price: 120, image: ''),
+        DeliveryOrderItem(id: 'i2', name: 'Paracetamol 650mg', quantity: 2, price: 30, image: ''),
+      ],
+      totalAmount: 180,
+      deliveryFee: 45,
+      paymentMethod: 'Prepaid',
+      orderStatus: 'pending',
+      orderTime: DateTime.now(),
+      storeName: 'Apollo Pharmacy',
+      storeLocation: const LatLng(17.4448, 78.3748),
+      isCod: false,
+      otpCode: '123456',
+    ),
+  ];
+
+  static final List<DeliveryOrder> _demoActiveOrders = [];
+  static final List<DeliveryOrder> _demoCompletedOrders = [];
+
   Future<DeliveryPartner?> loginDeliveryPartner(Map<String, dynamic> credentials) async {
-    try {
-      final response = await _apiService.post('/delivery/login/', data: credentials);
-      if (response.data['success']) {
-        return DeliveryPartner.fromJson(response.data['data']);
-      }
-      return null;
-    } catch (e) {
-      throw Exception('Login failed: $e');
-    }
+    return DeliveryPartner(
+      id: 'p_001',
+      deliveryPartnerId: 'AYURDEL001',
+      name: 'Rajesh Kumar',
+      phoneNumber: '9988776655',
+      email: 'rajesh@ayurvanta.com',
+      vehicleType: 'Bike',
+      vehicleNumber: 'TS 09 EZ 1234',
+      profileImage: '',
+      isAvailable: _currentAvailability,
+      rating: 4.9,
+      totalDeliveries: 124,
+      currentLocation: const LatLng(17.4400, 78.3800),
+      status: _currentAvailability ? 'online' : 'offline',
+      joinedDate: DateTime.now(),
+      deliveryZones: ['Hitech City'],
+    );
   }
 
   Future<List<DeliveryOrder>> getAvailableOrders() async {
-    try {
-      final response = await _apiService.get('/delivery/available-orders/');
-      if (response.data['success']) {
-        final List<dynamic> ordersJson = response.data['data'];
-        return ordersJson.map((json) => DeliveryOrder.fromJson(json)).toList();
-      }
-      return [];
-    } catch (e) {
-      throw Exception('Failed to load available orders: $e');
-    }
+    return _demoAvailableOrders;
   }
 
   Future<List<DeliveryOrder>> getActiveOrders(String partnerId) async {
-    try {
-      final response = await _apiService.get('/delivery/active-orders/?partner_id=$partnerId');
-      if (response.data['success']) {
-        final List<dynamic> ordersJson = response.data['data'];
-        return ordersJson.map((json) => DeliveryOrder.fromJson(json)).toList();
-      }
-      return [];
-    } catch (e) {
-      throw Exception('Failed to load active orders: $e');
-    }
+    return _demoActiveOrders;
   }
 
   Future<List<DeliveryOrder>> getCompletedOrders(String partnerId) async {
-    try {
-      final response = await _apiService.get('/delivery/completed-orders/?partner_id=$partnerId');
-      if (response.data['success']) {
-        final List<dynamic> ordersJson = response.data['data'];
-        return ordersJson.map((json) => DeliveryOrder.fromJson(json)).toList();
-      }
-      return [];
-    } catch (e) {
-      throw Exception('Failed to load completed orders: $e');
-    }
+    return _demoCompletedOrders;
   }
 
   Future<bool> acceptOrder(String orderId, String partnerId) async {
-    try {
-      final response = await _apiService.post('/delivery/accept-order/', data: {
-        'order_id': orderId,
-        'partner_id': partnerId,
-      });
-      return response.data['success'] ?? false;
-    } catch (e) {
-      throw Exception('Failed to accept order: $e');
+    final index = _demoAvailableOrders.indexWhere((o) => o.id == orderId);
+    if (index != -1) {
+      final order = _demoAvailableOrders.removeAt(index);
+      _demoActiveOrders.add(order);
     }
+    return true;
   }
 
   Future<bool> updateOrderStatus(String orderId, String status, String partnerId) async {
-    try {
-      final response = await _apiService.post('/delivery/update-status/', data: {
-        'order_id': orderId,
-        'status': status,
-        'partner_id': partnerId,
-      });
-      return response.data['success'] ?? false;
-    } catch (e) {
-      throw Exception('Failed to update order status: $e');
+    if (status == 'delivered') {
+      final index = _demoActiveOrders.indexWhere((o) => o.id == orderId);
+      if (index != -1) {
+        final order = _demoActiveOrders.removeAt(index);
+        _demoCompletedOrders.add(order);
+      }
     }
-  }
-
-  Future<bool> updateLocation(String partnerId, LatLng location) async {
-    try {
-      final response = await _apiService.post('/delivery/update-location/', data: {
-        'partner_id': partnerId,
-        'latitude': location.latitude,
-        'longitude': location.longitude,
-      });
-      return response.data['success'] ?? false;
-    } catch (e) {
-      throw Exception('Failed to update location: $e');
-    }
+    return true;
   }
 
   Future<bool> setAvailability(String partnerId, bool isAvailable) async {
-    try {
-      final response = await _apiService.post('/delivery/set-availability/', data: {
-        'partner_id': partnerId,
-        'is_available': isAvailable,
-      });
-      return response.data['success'] ?? false;
-    } catch (e) {
-      throw Exception('Failed to update availability: $e');
-    }
+    _currentAvailability = isAvailable;
+    return true;
   }
 }

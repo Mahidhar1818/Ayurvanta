@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/ayurvanta_logo.dart';
 import '../../home/screens/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -126,42 +127,12 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
                   // Enhanced Logo row
                   FadeInDown(
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.teal.withOpacity(0.4),
-                                blurRadius: 15,
-                                offset: const Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Image.asset(
-                              'assets/images/logo.png',
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 14),
-                        const Text(
-                          'AyurVanta',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 26,
-                            fontFamily: 'SF Pro Display',
-                            letterSpacing: -0.5,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ],
+                    child: Center(
+                      child: AyurVantaLogo(
+                        size: 100, 
+                        showText: true, 
+                        textColor: Colors.white
+                      ),
                     ),
                   ),
 

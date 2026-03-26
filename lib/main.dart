@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'core/translations/app_translations.dart';
 import 'features/onboarding/screens/splash_screen.dart';
 import 'features/pharmacy/providers/cart_provider.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  
+  // Keep splash screen visible while loading
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  
   await AppTranslations.instance.load();
+  
   runApp(
     MultiProvider(
       providers: [
@@ -15,6 +21,9 @@ Future<void> main() async {
       child: const AyurVantaApp(),
     ),
   );
+  
+  // Remove splash screen after app loads
+  FlutterNativeSplash.remove();
 }
 
 class AyurVantaApp extends StatefulWidget {
